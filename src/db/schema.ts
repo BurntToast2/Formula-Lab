@@ -1,6 +1,72 @@
-import { integer, pgTable, text } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import {
+    pgEnum,
+    pgTable,
+    primaryKey,
+    text,
+    timestamp,
+    uuid,
+    uniqueIndex,
+} from "drizzle-orm/pg-core";
+
+export const userRole = pgEnum("user_role", [
+    "team_leader",
+    "member",
+]);
+
+export const taskStatus = pgEnum("task_status", [
+    "todo",
+    "in_progress",
+    "completed",
+    "cancelled",
+]);
+
+export const taskPriority = pgEnum("task_priority", [
+    "low",
+    "medium",
+    "high",
+]);
+
+
+export const teams = pgTable("teams", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull().unique(),
+});
 
 export const users = pgTable("users", {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    name: text().notNull(),
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    email: text("email").notNull().unique(),
+    teamId: uuid("team_id").notNull().references(() => teams.id),
+    role: userRole("role").notNull(),
+    },
+    (table) => [
+        uniqueIndex("one_team_leader_per_team")
+            .on(table.teamId)
+            .where(sql`${table.role} = 'team_leader'`),
+    ],
+);
+
+export const tasks = pgTable("tasks", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    title: text("title").notNull(),
+    description: text("description"),
+    teamId:  uuid("team_id").notNull().references(() => teams.id),
+    createdById: uuid("created_by_id").notNull().references(() => users.id),
+    status: taskStatus("status").notNull().default("todo"),
+    priority: taskPriority("priority").notNull().default("medium"),
+    dueDate: timestamp("due_date"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(), 
 });
+
+export const taskResponsibilities = pgTable("task_responsibilities", {
+    taskId: uuid("task_id").notNull().references(() => tasks.id),
+    userId: uuid("user_id").notNull().references(() => users.id),
+},
+    (table) => [
+        primaryKey({
+            columns: [table.taskId, table.userId],
+        }),
+    ],
+);

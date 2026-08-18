@@ -1,14 +1,19 @@
-export default function Home(){
-    return (
-        <main>
-            <h1>Formula Lab</h1>
+import { getTeams } from "@/data/teams";
 
-            <section>
-                <h2>Team Overview</h2>
-                <p>Members: 13</p>
-                <p>Open tasks: 8</p>
-                <p>Completed tasks: 24</p>
-            </section>
-        </main>
-    );
+export default async function Home() {
+  const teams = await getTeams();
+
+  return (
+    <main>
+      <h1>Formula Lab</h1>
+
+      <h2>Teams</h2>
+
+      <ul>
+        {teams.map((team) => (
+          <li key={team.id}>{team.name}</li>
+        ))}
+      </ul>
+    </main>
+  );
 }
