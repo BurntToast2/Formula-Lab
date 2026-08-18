@@ -306,3 +306,4 @@ The developer wants to understand what each command and piece of code does.
 - Discuss alternatives when making meaningful technical decisions.
 - Do not assume SSR is mandatory.
 - Do not introduce infrastructure without a concrete reason.
+
