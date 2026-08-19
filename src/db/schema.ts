@@ -28,6 +28,15 @@ export const taskPriority = pgEnum("task_priority", [
 ]);
 
 
+export const invitations = pgTable("invitations", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: text("email").notNull(),
+    token: text("token").notNull().unique(),
+    expiresAt: timestamp("expires_at").notNull(),
+    acceptedAt: timestamp("accepted_at"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const teams = pgTable("teams", {
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull().unique(),

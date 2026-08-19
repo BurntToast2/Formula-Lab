@@ -1,79 +1,88 @@
 # Formula Student Manager — AI Project Context
 
-
 ## Project
-
 
 **Name:** Formula Lab
 
-
 **Purpose:**
 A full-stack web application for managing a Formula Student team's members,
-teams, tasks, deadlines, and eventually other team workflows.
-
+teams, projects, tasks, deadlines, and eventually other team workflows.
 
 The application should be accessible from anywhere by teammates without the
 developer's personal computer being switched on.
 
-
 ---
 
+# Developer
 
-## Developer background
+The developer already understands:
 
-
-The developer is already familiar with:
-
-
+* SQL
+* PostgreSQL
+* relational database concepts
+* primary keys
+* foreign keys
+* relationships
+* database normalization
 * React
 * TypeScript
 * Node.js
 * Electron
-* PostgreSQL
-* Desktop/web app development concepts
-
+* general web/desktop development concepts
 
 The developer is learning:
 
-
 * Next.js
-* Modern web application architecture
-* Browser/server boundaries
-* Web deployment
-* Production web development
-* Using Neovim and the terminal as the primary development environment
-* Using Git from the terminal/Neovim workflow
-* Drizzle ORM
-* Database schema design and migrations
+* Next.js App Router
+* modern full-stack web architecture
+* browser/server boundaries
+* Server Components
+* Client Components
+* Server Actions
+* Route Handlers
+* production web development
+* Drizzle ORM syntax
+* Drizzle schema design
+* Better Auth
+* authentication architecture
+* Git/Neovim/terminal workflow
 
+### Teaching preference
 
-### Teaching preferences
+The developer wants to **write the code themselves**.
 
+AI should act primarily as:
 
-* Explain code that is provided.
-* Do not dump large amounts of unexplained code.
-* Explain what a piece of code does, why it is needed, and important syntax.
-* Prefer incremental implementation and debugging over generating the entire app.
-* The developer wants to understand architectural decisions and be able to
-  explain the resulting code in interviews.
-* When suggesting technologies, explain the problem first, then possible
-  solutions, then why the chosen solution is appropriate.
-* Prefer understanding and verifying each step over blindly following commands.
-* Explain important Git commands and distinguish the working tree, staging
-  area, and commits.
-* Explain unfamiliar programming concepts and syntax when they are introduced.
-* Prefer teaching the reasoning behind database design rather than simply
-  generating schemas.
+* teacher
+* architect
+* debugger
+* reviewer
+* technical discussion partner
 
+AI should not turn the project into a copy/paste exercise.
+
+When implementing features:
+
+1. Explain the problem first.
+2. Explain the architectural decision.
+3. Explain important syntax when it is unfamiliar.
+4. Let the developer implement the code.
+5. Help diagnose errors.
+6. Prefer small incremental changes.
+7. Avoid dumping complete features unless explicitly requested.
+
+The developer already understands SQL, so database explanations should focus on
+how the concepts translate into Drizzle rather than re-teaching relational
+database fundamentals.
+
+The developer wants to understand decisions well enough to explain the
+resulting architecture in interviews.
 
 ---
 
+# Agreed Stack
 
-## Agreed initial stack
-
-
-### Core
-
+## Core
 
 * TypeScript
 * React
@@ -81,815 +90,861 @@ The developer is learning:
 * Next.js App Router
 * PostgreSQL
 
-
-### Database
-
+## Database
 
 * Drizzle ORM
 * Neon PostgreSQL
+* @neondatabase/serverless
 
+## Authentication
 
-### Authentication
-Reason
+* Better Auth
+* Email/password authentication
+* Invitation-only registration
 
-The developer wants to learn Next.js, and the application does not initially
-need a separate backend service.
+## Validation
 
-Keeping the frontend and server-side logic in one Next.js application reduces
-unnecessary complexity.
+* Zod
 
-Important Next.js concepts
+## Forms
 
-Do not describe Next.js simply as "an SSR framework."
+* React Hook Form
+
+## Styling
+
+* Tailwind CSS
+* shadcn/ui
+
+## Deployment
+
+* Vercel
+* Neon PostgreSQL
+
+## Version control
+
+* Git
+* GitHub
+
+## Testing
+
+* Vitest
+* Playwright
+
+## Later / only when needed
+
+* Sentry
+* Cloudflare R2 or Supabase Storage
+* Resend
+* Realtime technology
+* Inngest or Trigger.dev
+* Advanced search technology
+
+---
+
+# Architecture
+
+The application is intentionally **not** split into a separate React frontend
+and Express backend.
+
+The initial architecture is:
+
+Browser → Next.js → Drizzle ORM → Neon PostgreSQL
+
+Next.js will contain:
+
+* React UI
+* Server Components
+* Client Components
+* Server Actions
+* Route Handlers where appropriate
+* authentication
+* authorization
+* validation
+* server-side database access
+
+The application does not initially require a separate backend service.
+
+The developer is specifically using this project to learn Next.js and modern
+full-stack web architecture.
+
+---
+
+# Important Next.js Concepts
+
+Next.js should not be described simply as an SSR framework.
 
 The application can mix server and client code.
 
-Important concepts to learn:
+Important concepts being learned:
 
-Server Components
-Client Components
-Server Actions
-Route Handlers
-static rendering
-dynamic rendering
-caching
-authentication
-authorization
-browser/server boundaries
+* Server Components
+* Client Components
+* Server Actions
+* Route Handlers
+* static rendering
+* dynamic rendering
+* caching
+* authentication
+* authorization
+* browser/server boundaries
 
-SSR is not required because of SEO. This is an internal team application.
+SSR is not required for SEO because Formula Lab is an internal team
+application.
 
 Next.js server-side capabilities are useful for:
 
-server-side logic
-database access
-security
-authentication
-authorization
-reducing unnecessary API boilerplate
-Database architecture
+* server-side logic
+* database access
+* security
+* authentication
+* authorization
+* reducing unnecessary API boilerplate
+
+---
+
+# Database Architecture
 
 The application uses:
 
-Next.js
-   |
-   v
-Drizzle ORM
-   |
-   v
-@neondatabase/serverless
-   |
-   v
-Neon PostgreSQL
-Drizzle responsibilities
+Next.js → Drizzle ORM → @neondatabase/serverless → Neon PostgreSQL
+
+### Drizzle responsibilities
 
 Drizzle is responsible for:
 
-defining database schemas in TypeScript
-querying PostgreSQL
-providing type-safe database access
-working with database schema changes through Drizzle Kit
-Neon responsibilities
+* defining PostgreSQL schemas in TypeScript
+* querying PostgreSQL
+* providing type-safe database access
+* managing schema changes through Drizzle Kit
+
+### Neon responsibilities
 
 Neon provides the hosted PostgreSQL database.
 
-The database connection string is stored in:
-
-.env.local
+The database connection string is stored in `.env.local`.
 
 The connection string must never be committed to Git or pasted into
 conversation.
 
-.env.local has been verified as ignored by Git.
+`.env.local` is ignored by Git.
 
-Current database files
+---
 
-The project currently contains:
+# Database Files
 
-src/
-├── app/
-│   ├── favicon.ico
-│   ├── globals.css
-│   ├── layout.tsx
-│   └── page.tsx
-│
-└── db/
-    ├── index.ts
-    └── schema.ts
+Current database-related files include:
 
+* `src/db/schema.ts`
+* `src/db/index.ts`
+* `drizzle.config.ts`
 
-drizzle.config.ts
-drizzle.config.ts
+### `drizzle.config.ts`
 
 Purpose:
 
-tells Drizzle Kit where the schema is located
-tells Drizzle Kit that the database is PostgreSQL
-loads .env.local
-provides the DATABASE_URL to Drizzle Kit
+* tells Drizzle Kit where the schema is
+* identifies PostgreSQL as the dialect
+* loads `.env.local`
+* provides `DATABASE_URL` to Drizzle Kit
 
-Current configuration:
+### `src/db/index.ts`
 
-import { config } from "dotenv";
-import { defineConfig } from "drizzle-kit";
+Contains the application database client.
 
+It is server-only.
 
-config({ path: ".env.local" });
+It must not be imported into browser/client code because it provides database
+access and depends on server-side environment variables.
 
+The project uses `server-only` to prevent accidental client-side imports.
 
-export default defineConfig({
-  schema: "./src/db/schema.ts",
-  dialect: "postgresql",
-  dbCredentials: {
-    url: process.env.DATABASE_URL!,
-  },
-});
-src/db/index.ts
+---
 
-This contains the application database client:
+# Database Verification
 
-import "server-only";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+The following have been successfully verified:
 
+* Drizzle ORM is installed and working.
+* Drizzle Kit is installed and working.
+* Neon PostgreSQL connection works.
+* `.env.local` is loaded correctly.
+* `DATABASE_URL` is available without exposing its value.
+* Drizzle Kit can push schema changes to Neon.
+* Application database access works.
+* TypeScript compilation has been successfully verified during development.
+* Temporary database connection tests have successfully queried PostgreSQL.
 
-const sql = neon(process.env.DATABASE_URL!);
+The temporary database test files used during setup were removed afterward.
 
+---
 
-export const db = drizzle(sql);
+# Drizzle Kit Note
 
-Important architectural point:
+`drizzle-kit check` previously produced an unexpected AWS Data API error even
+though the PostgreSQL/Neon configuration was valid.
 
-src/db/index.ts is server-only.
-
-It must not be imported into browser/client code because it provides access
-to the database and relies on server-side environment variables.
-
-server-only is used to make accidental client-side imports fail during the
-Next.js build/development process.
-
-Current Formula Lab database model
-
-The initial database model has now been agreed upon.
-
-The MVP focuses on:
-
-Team
-User
-Task
-Task Responsibility
-
-Projects are not part of the initial database model.
-
-They may be introduced later if the team's workflow requires them.
-
-Teams
-
-The teams table represents Formula Student subteams/departments.
-
-Initial teams:
-
-Chassis
-Drivetrain
-Suspension
-Brakes
-Electronics
-
-Additional teams can be added later without changing the database schema.
-
-Examples:
-
-Business
-Media
-Marketing
-etc.
-
-Important design decision:
-
-Teams are data, not hard-coded database structure.
-
-The schema only defines what a team looks like:
-
-teams
-----------------
-id
-name
-
-The actual team names are stored as rows in the table.
-
-Team requirements
-A team has a unique name.
-A team can have many users.
-A team can have many tasks.
-Each user belongs to one team.
-Each task belongs to one team.
-Each team has exactly one team leader.
-Users
-
-Users represent Formula Lab members.
-
-Initial conceptual fields:
-
-users
-----------------
-id
-name
-email
-team_id
-role
-User requirements
-A user belongs to exactly one team.
-A user has one role.
-Roles are:
-team_leader
-member
-Each team should have exactly one team leader.
-
-Better Auth will eventually manage authentication and session-related data.
-
-The application user model should be designed to work alongside Better Auth
-rather than attempting to recreate authentication manually.
-
-User roles
-
-The user role is represented using a PostgreSQL enum.
-
-Current allowed values:
-
-team_leader
-member
-
-In Drizzle:
-
-export const userRole = pgEnum("user_role", [
-  "team_leader",
-  "member",
-]);
-
-The enum is then used by the users table:
-
-role: userRole("role").notNull(),
-
-Important teaching point:
-
-pgEnum(...) defines a PostgreSQL enum type.
-
-Calling:
-
-userRole("role")
-
-uses that enum as the type of the role column.
-
-The enum prevents arbitrary values from being stored in the role column.
-
-The database should eventually enforce the additional business rule that
-each team has exactly one team leader.
-
-Tasks
-
-Tasks are the primary workflow object in the MVP.
-
-Every task:
-
-belongs to exactly one team
-has a creator
-can have multiple responsible users
-has a status
-has a priority
-has a due date
-has creation/update timestamps
-
-There is no primary assignee.
-
-The application deliberately uses responsible users instead.
-
-For example:
-
-Task:
-  Design brake pedal mount
-
-
-Team:
-  Brakes
-
-
-Created by:
-  Alice
-
-
-Responsible:
-  Bob
-  Charlie
-
-The distinction is:
-
-team_id = which team owns the task
-created_by_id = who created the task
-task_responsibilities = which users are responsible for completing it
-Task status
-
-Task status is represented using a PostgreSQL enum.
-
-Current planned values:
-
-todo
-in_progress
-completed
-cancelled
-
-Conceptually:
-
-todo
-  |
-  v
-in_progress
-  |
-  v
-completed
-
-cancelled allows a task to be closed without pretending it was completed.
-
-The exact workflow may be expanded later if required.
-
-Task priority
-
-Task priority is represented using a PostgreSQL enum.
-
-Current values:
-
-low
-medium
-high
-
-New tasks default to:
-
-medium
-Task table
-
-The conceptual structure is:
-
-tasks
-----------------
-id
-title
-description
-team_id
-created_by_id
-status
-priority
-due_date
-created_at
-updated_at
-
-Important relationships:
-
-tasks.team_id
-      |
-      v
-teams.id
-
-and:
-
-tasks.created_by_id
-      |
-      v
-users.id
-
-Therefore:
-
-Task ──────► Team
-Task ──────► User (creator)
-Task responsibilities
-
-A task can have multiple responsible users.
-
-A user can be responsible for multiple tasks.
-
-This is a many-to-many relationship.
-
-It is represented using a junction table:
-
-task_responsibilities
-----------------------
-task_id
-user_id
-
-Relationships:
-
-task_responsibilities.task_id
-        |
-        v
-     tasks.id
-
-and:
-
-task_responsibilities.user_id
-        |
-        v
-     users.id
-
-Conceptually:
-
-User ──────────────┐
-                   │
-                   ▼
-              Task Responsibility
-                   ▲
-                   │
-Task ──────────────┘
-
-The junction table should use a composite primary key:
-
-(task_id, user_id)
-
-This prevents the same user from being added as responsible for the same task
-more than once.
-
-Current Drizzle schema progress
-
-The real Formula Lab schema is currently being implemented incrementally.
-
-The temporary test schema has been replaced by the beginning of the actual
-Formula Lab model.
-
-The current schema includes:
-
-teams
-user_role enum
-users
-task_status enum
-task_priority enum
-tasks
-
-The task_responsibilities junction table is the next major table to add.
-
-The task date/time fields are also being reviewed so that proper PostgreSQL
-date/time types are used rather than storing dates/times as arbitrary text.
-
-Current schema design principles
-IDs
-
-The project uses UUIDs rather than sequential integer IDs.
-
-Example:
-
-id: uuid("id").primaryKey().defaultRandom(),
-
-Reasons:
-
-IDs are not predictable/sequential.
-UUIDs work well in distributed/web applications.
-PostgreSQL supports UUIDs natively.
-Drizzle provides straightforward UUID support.
-Foreign keys
-
-Relationships are enforced using PostgreSQL foreign keys.
-
-Example:
-
-teamId: uuid("team_id")
-  .notNull()
-  .references(() => teams.id),
-
-This means:
-
-the user must have a team
-the stored team_id must refer to an existing team
-
-The database therefore enforces data integrity rather than relying only on
-application code.
-
-Nullable vs required fields
-
-Fields should only be nullable when the application has a meaningful reason
-for allowing them to be absent.
-
-For example:
-
-title: text("title").notNull(),
-
-because every task needs a title.
-
-Whereas:
-
-description: text("description"),
-
-allows a task to exist without a description.
-
-Nullability should be deliberately discussed rather than added or removed
-arbitrarily.
-
-Database verification completed
-
-The following have been successfully verified.
-
-Drizzle Kit installation
-
-Installed:
-
-drizzle-orm@0.45.2
-@neondatabase/serverless@1.1.0
-drizzle-kit@0.31.10
-dotenv
-Configuration
-
-Drizzle Kit successfully loads:
-
-.env.local
-
-and can access:
-
-DATABASE_URL
-
-without exposing the value.
-
-Schema deployment
-
-This command successfully connected to Neon and applied the schema:
-
-npx drizzle-kit push
-
-Output included:
-
-Using '@neondatabase/serverless' driver for database querying
-[✓] Pulling schema from database...
-[✓] Changes applied
-
-Therefore Drizzle Kit and the Neon database connection are working.
-
-Application connection
-
-A temporary TypeScript connection test successfully executed:
-
-SELECT 1 AS connected
-
-and returned:
-
-[ { connected: 1 } ]
-
-The temporary test file was deleted afterward.
-
-Type checking
-
-The following command completed without errors:
-
-npx tsc --noEmit
-
-This is being used regularly while building the schema.
-
-Drizzle Kit note
-
-drizzle-kit check produced an unexpected AWS Data API error despite the
-PostgreSQL configuration being valid and the Neon connection working through
-drizzle-kit push.
-
-The error was:
-
-Please provide required params for AWS Data API driver:
-database: undefined
-secretArn: 'postgresql'
+The error referred to missing AWS Data API parameters.
 
 This did not prevent the actual Neon workflow from working.
 
-drizzle-kit push successfully used the Neon serverless driver and applied
-the schema.
+`drizzle-kit push` successfully uses the Neon serverless driver and applies
+schema changes.
 
-Do not spend further time debugging drizzle-kit check unless it becomes
-necessary for the project's migration workflow.
+Do not spend additional time debugging `drizzle-kit check` unless it becomes
+necessary for the migration workflow.
 
-Initial MVP
-Authentication
-Login
-Logout
-User/session handling
-Eventually team invitations
+---
 
-Authentication will be implemented using Better Auth.
+# Current Database Model
 
-Users
-Name
-Email
-Team
-Role
+The real Formula Lab database model has now been designed and implemented in
+Drizzle.
 
-Roles:
+## Teams
 
-team_leader
-member
-Teams
+A `teams` entity represents a Formula Lab team.
 
 Initial teams:
 
-Chassis
-Drivetrain
-Suspension
-Brakes
-Electronics
+* Chassis
+* Drivetrain
+* Suspension
+* Brakes
+* Electronics
 
-Teams can be added later, for example:
+Additional teams can be added later, for example:
 
-Business
-Media
-Marketing
-Tasks
-Title
-Description
-Team
-Creator
-Responsible users
-Status
-Priority
-Due date
-Created timestamp
-Updated timestamp
+* Business
+* Media
 
-There is intentionally no primary assignee.
+Teams are intentionally data-driven rather than hard-coded so the application
+can grow.
 
-Dashboard
+Each team has:
 
-Potential features:
+* unique ID
+* unique name
 
-Overdue tasks
-Active tasks
-Completed tasks
-Tasks for the user's team
-Tasks a user is responsible for
-Basic team progress
-Projects
+---
 
-Projects are not currently part of the MVP database model.
+# Users
 
-Earlier planning included projects such as:
+The `users` table represents Formula Lab users.
 
-2026 Car
-Accumulator
-Suspension
-Telemetry
-Driverless
+Current conceptual fields:
 
-These may be introduced later if the application needs project-level
-organisation.
+* ID
+* name
+* email
+* team
+* role
 
-Do not add a projects table simply because it appeared in earlier planning.
+The user's team is represented through a foreign key to `teams`.
 
-Development milestones
-Milestone 1
-Git repository
-Next.js project
-Runs locally
-Basic page
-Basic Git workflow
+The user's role is represented by a PostgreSQL enum.
 
-Status: substantially complete
+Current roles:
 
-Milestone 2
-PostgreSQL
-Drizzle
-Database schema
-Read/write data
+* `team_leader`
+* `member`
 
-Status: in progress
+There is currently a database constraint ensuring that a team has at most one
+team leader.
+
+Authentication will eventually integrate Better Auth with the existing user
+model rather than creating an unnecessary duplicate Formula Lab user table.
+
+The exact Better Auth integration still needs to be designed and implemented.
+
+---
+
+# Tasks
+
+Every task belongs to exactly one team.
+
+A task has:
+
+* title
+* optional description
+* team
+* creator
+* status
+* priority
+* optional due date
+* creation timestamp
+
+A task does **not** have a single primary assignee.
+
+Instead, a task can have multiple responsible users.
+
+This is necessary because Formula Lab has cross-team work.
+
+For example:
+
+A single task could involve:
+
+* one Electronics member
+* one Drivetrain member
+
+Therefore task responsibility is represented using a many-to-many relationship.
+
+---
+
+# Task Responsibilities
+
+The `task_responsibilities` table links:
+
+* tasks
+* users
+
+It uses a composite primary key consisting of:
+
+* task ID
+* user ID
+
+This prevents the same user from being assigned responsibility for the same
+task more than once.
+
+A task still belongs to one primary team through its own team foreign key.
+
+The responsible users may belong to different teams.
+
+This supports cross-team tasks.
+
+---
+
+# Task Status
+
+Current task statuses:
+
+* `todo`
+* `in_progress`
+* `completed`
+* `cancelled`
+
+---
+
+# Task Priority
+
+Current priorities:
+
+* `low`
+* `medium`
+* `high`
+
+---
+
+# Dashboard Requirement
+
+When a user views the dashboard, they should see the tasks that are still
+pending for their team.
+
+Because tasks can have responsible users from different teams, dashboard
+queries will eventually need to account for both:
+
+* the task's owning team
+* users responsible for the task
+
+The exact dashboard query logic will be designed when the dashboard is built.
+
+---
+
+# Invitations
+
+Registration is **invitation-only**.
+
+For the initial MVP:
+
+* only the developer can create invitations
+* team leaders cannot create invitations yet
+* invitations are for SETU student email addresses
+* the required email domain is `setu.ie`
+* the student chooses their own team during registration
+* the invitation does not contain a team
+* new students initially receive the `member` role
+
+The invitation controls whether an email address is authorized to register.
+
+It does not determine the student's team.
+
+---
+
+# Invitation Entity
+
+The `invitations` table has been designed and added to the Drizzle schema.
+
+Conceptual fields:
+
+* ID
+* email
+* token
+* expiration timestamp
+* accepted timestamp
+* creation timestamp
+
+### Invitation rules
+
+* ID is a UUID primary key.
+* Email is required.
+* Token is required and unique.
+* Expiration is required.
+* Accepted timestamp is nullable.
+* Creation timestamp is required and defaults to the current time.
+
+`acceptedAt` is used instead of a boolean such as `used`.
+
+Therefore:
+
+* `acceptedAt = NULL` means the invitation has not been accepted.
+* a populated `acceptedAt` means the invitation was successfully used.
+
+This preserves useful historical information.
+
+Invitations are not automatically deleted when expired.
+
+An invitation is valid only when it:
+
+* has not been accepted
+* has not expired
+
+Only one active invitation should exist for a given email address.
+
+The implementation of that business rule will be handled when the invitation
+workflow is built.
+
+---
+
+# Invitation Security
+
+Invitation tokens are temporary secrets.
+
+They must be:
+
+* cryptographically random
+* sufficiently unpredictable
+* single-use
+* associated with the invitation record
+* invalid after acceptance
+* invalid after expiration
+
+Tokens must not be predictable values such as sequential IDs, names, or email
+addresses.
+
+The invitation token is separate from the user's password.
+
+The token proves:
+
+> This email address was invited to register.
+
+The password is later handled by Better Auth for authentication.
+
+---
+
+# Authentication Design
+
+The application will use Better Auth.
+
+Authentication method:
+
+* email
+* password
+
+Registration is not publicly available.
+
+A student must have a valid invitation before being allowed to create an
+account.
+
+The intended flow is:
+
+1. Developer creates an invitation for a student's SETU email.
+2. Student receives an invitation link.
+3. Student opens the invitation link.
+4. The application validates the invitation.
+5. Student enters their name and password.
+6. Student chooses their Formula Lab team.
+7. The account is created.
+8. The student becomes a `member`.
+9. The invitation is marked as accepted.
+10. The student receives an authenticated session.
+
+The student's team is chosen during registration rather than being selected by
+the person sending the invitation.
+
+The invitation therefore establishes eligibility, while the student chooses
+their team.
+
+---
+
+# Authentication vs Authorization
+
+These are deliberately separate concepts.
+
+### Authentication
+
+Better Auth answers:
+
+> Who is this person?
+
+### Authorization
+
+Formula Lab answers:
+
+> What is this person allowed to do?
+
+Examples:
+
+* which team the user belongs to
+* whether the user is a team leader
+* which team data they can manage
+* which tasks they can modify
+
+Better Auth handles authentication infrastructure.
+
+Formula Lab owns its application-specific authorization rules.
+
+---
+
+# Better Auth User Integration
+
+The preferred architecture is to avoid maintaining two separate representations
+of the same person.
+
+The existing Formula Lab `users` model should be integrated with Better Auth's
+user model where practical.
+
+Better Auth needs additional authentication-related data such as:
+
+* sessions
+* authentication credentials
+* potentially accounts/providers
+* verification information
+
+The exact Better Auth schema and integration have **not yet been implemented**.
+
+Before modifying the user schema for Better Auth, explicitly discuss:
+
+* Better Auth's required tables
+* how its user table maps to the existing Formula Lab user
+* additional user fields
+* relationships between authentication data and Formula Lab data
+* how invitations interact with registration
+
+Do not blindly replace the existing user model.
+
+---
+
+# Signup Email Rule
+
+The initial application is intended for SETU students.
+
+The registration process should enforce the `@setu.ie` email domain.
+
+The invitation should also be associated with the invited email address.
+
+The registration flow should ensure that the email used for account creation
+matches the email that was invited.
+
+The student should not be able to use someone else's invitation token to create
+an account for a different email address.
+
+---
+
+# Invitation Workflow
+
+The intended future workflow is:
+
+Developer
+→ creates invitation
+→ invitation is stored
+→ invitation email is sent
+→ student clicks secure link
+→ invitation is validated
+→ student registers
+→ student chooses team
+→ Better Auth creates/authenticates the account
+→ invitation is marked accepted
+
+Email delivery has not yet been implemented.
+
+For the first implementation, invitation creation can be tested without
+sending real email.
+
+---
+
+# Current Next.js Direction
+
+Invitation functionality will eventually be implemented using server-side
+Next.js logic.
+
+A likely structure is:
+
+* UI
+* Server Action
+* invitation validation/business logic
+* Drizzle
+* PostgreSQL
+
+The developer is currently learning Server Actions and the browser/server
+boundary.
+
+Before implementing the invitation function, explain:
+
+* what a Server Action is
+* what `"use server"` means
+* why invitation/database logic belongs on the server
+* what data should cross the browser/server boundary
+
+---
+
+# Current Project Structure
+
+The project currently includes:
+
+* `src/app/`
+* `src/app/actions/`
+* `src/db/`
+* `src/data/`
+* `drizzle.config.ts`
+
+The `src/app/actions/` directory has already been used for the seed-team
+Server Action.
+
+Seed teams have been successfully created in the database and are visible in
+the application.
+
+The initial seed functionality was only for development and database setup.
+
+---
+
+# Completed Development Milestones
+
+## Milestone 1 — Project Setup
 
 Completed:
 
-Neon PostgreSQL database
-Drizzle ORM installation
-Drizzle Kit installation
-Database configuration
-Neon connection
-Server-side database client
-Initial schema deployment
-UUID-based schema design
-Teams table
-Users table
-User role enum
-Tasks table
-Task status enum
-Task priority enum
+* Git repository
+* Next.js project
+* local development
+* basic page
+* initial Git workflow
+
+## Milestone 2 — Database Foundation
+
+Completed:
+
+* PostgreSQL
+* Neon
+* Drizzle ORM
+* Drizzle Kit
+* database client
+* initial schema
+* database connectivity
+* schema deployment
+* teams
+* users
+* tasks
+* task responsibilities
+* enums
+* constraints
+* invitation table
+
+## Milestone 3 — Initial Data
+
+Completed:
+
+* team seed functionality
+* initial Formula Student teams inserted into Neon
+* teams displayed by the application
+
+## Milestone 4 — Authentication
+
+Started.
+
+Agreed:
+
+* Better Auth
+* email/password
+* invitation-only registration
+* SETU email domain
+* developer-only invitation creation
+* student chooses team
+* new users default to member
 
 Remaining:
 
-finalize task date/time types
-add task_responsibilities
-enforce the one-team-leader-per-team rule
-seed initial teams
-establish the preferred migration workflow
-implement application database queries
-Milestone 3
-Authentication
-Users
-Sessions
+* Better Auth architecture
+* Better Auth schema
+* Better Auth integration
+* invitation creation
+* invitation validation
+* signup flow
+* sessions
+* protected routes
+* authorization
 
-Then:
+---
 
-Teams
-Tasks
-Dashboard
-Authorization/RBAC
-Testing
-Deployment
+# Current Immediate Next Task
 
-Projects may be introduced later if required.
+The immediate next task is to begin implementing the invitation workflow.
 
-Git / Neovim / terminal learning goal
+First, understand Next.js Server Actions and the server/client boundary.
 
-The developer uses Neovim and terminal and wants to become comfortable with
-the complete terminal-based workflow.
+Then create the server-side invitation operation that will eventually:
+
+* receive an email
+* validate the SETU domain
+* generate a secure invitation token
+* calculate an expiration time
+* create the invitation record
+* eventually trigger invitation email delivery
+
+Do not implement email delivery yet.
+
+Do not implement the complete signup flow yet.
+
+Build and verify the invitation creation mechanism first.
+
+---
+
+# Git / Terminal / Neovim Learning
+
+The developer uses Neovim and the terminal and wants to become comfortable
+with the complete terminal-based workflow.
 
 Teach:
 
-git status
-git add
-git commit
-git log
-git diff
-git branch
-git switch
-git merge / rebase when appropriate
-git push
-git pull
-GitHub workflow
-useful terminal commands
-Neovim workflow
+* `git status`
+* `git add`
+* `git commit`
+* `git log`
+* `git diff`
+* `git branch`
+* `git switch`
+* `git merge`
+* `git rebase` when appropriate
+* `git push`
+* `git pull`
+* GitHub workflow
+* useful terminal commands
+* Neovim workflow
 
-When giving shell commands:
+When giving commands:
 
-Explain what each command does.
-Explain important flags/options when they matter.
-Prefer safe and understandable commands.
-Warn before destructive commands.
+1. Explain what each command does.
+2. Explain important flags when relevant.
+3. Prefer safe commands.
+4. Warn before destructive commands.
 
-Important Git principle:
+Important Git concepts:
 
-working tree = changes not staged
-staging area = changes selected for the next commit
-commit = saved snapshot in local Git history
-push = sends commits to a remote such as GitHub
+* working tree = changes not staged
+* staging area = changes selected for the next commit
+* commit = saved snapshot in local Git history
+* push = sends commits to a remote repository
 
-Avoid committing secrets.
+Never commit secrets.
 
-AI usage philosophy
+---
 
-AI is being used responsibly as a development and learning tool.
+# AI Usage Philosophy
+
+AI is being used as a development and learning tool.
 
 AI should help with:
 
-explaining concepts
-debugging
-comparing approaches
-researching unfamiliar APIs
-reviewing code
-accelerating implementation
+* explaining concepts
+* debugging
+* comparing approaches
+* researching unfamiliar APIs
+* reviewing code
+* architectural reasoning
+* accelerating learning
 
-AI should NOT turn the project into a black box.
+AI should **not** turn Formula Lab into a black box.
+
+The developer writes the implementation.
 
 Architectural decisions should be explicitly discussed.
 
-If an architectural decision changes, document it in DECISIONS.md.
+If an architectural decision changes, document it in `DECISIONS.md`.
 
-Context / handoff files
+AI should not assume that producing a complete code solution is the best way
+to help.
 
-Recommended files:
+When the developer asks what to do next, prefer:
 
-docs/PROJECT.md
-docs/ARCHITECTURE.md
-docs/DECISIONS.md
-docs/DATABASE.md
-docs/PROGRESS.md
-docs/AI_CONTEXT.md
+1. explain the objective
+2. explain why it matters
+3. identify the relevant concepts
+4. give the developer a small implementation task
+5. review/debug the result
 
-This file is the portable context for AI assistants.
+---
 
-Current Git / security rules
+# Context / Handoff Files
 
-Important:
+Recommended project documentation:
 
-.env.local is ignored by Git.
-.env.local must remain untracked.
-Never commit the database connection string.
-Never paste the database connection string into AI conversations.
-Never add .env.local to Git.
-Review git status before committing.
-Review staged changes when a significant dependency or schema change is
-being committed.
-Current immediate next task
+* `docs/PROJECT.md`
+* `docs/ARCHITECTURE.md`
+* `docs/DECISIONS.md`
+* `docs/DATABASE.md`
+* `docs/PROGRESS.md`
+* `docs/AI_CONTEXT.md`
 
-Continue implementing the agreed Formula Lab database schema incrementally.
+`AI_CONTEXT.md` is the portable context for AI assistants.
 
-The next steps are:
+It should document:
 
-Finalize proper PostgreSQL date/time types for tasks.
-Add the task_responsibilities many-to-many junction table.
-Add the database constraint needed to enforce exactly one team leader per
-team.
-Type-check the complete schema.
-Review the schema before applying it to Neon.
-Add initial team data.
-Establish the preferred Drizzle migration workflow.
-Begin implementing database queries through the server-side database
-client.
+* architecture
+* decisions
+* project state
+* data model
+* development philosophy
+* current task
+* important constraints
 
-Do not immediately generate large amounts of application code.
+It should **not** become a copy of the project's source code.
 
-Continue explaining each significant database concept and architectural
-decision before implementing it.
+Source code belongs in the repository.
+
+---
+
+# Security Rules
+
+Never commit:
+
+* `.env.local`
+* database connection strings
+* passwords
+* authentication secrets
+* invitation tokens
+* API keys
+
+Invitation tokens are secrets and should not be exposed unnecessarily in logs,
+UI, or source control.
+
+Database access must remain server-side.
+
+Client components must not directly import the database client.
+
+---
+
+# Current Checkpoint
+
+The following are currently true:
+
+* Neon is connected.
+* Drizzle is working.
+* The main database schema exists.
+* Teams exist and have been seeded.
+* Users, tasks, and task responsibility relationships are designed.
+* Invitation schema exists and has been pushed to Neon.
+* The project is ready to begin the invitation/authentication workflow.
+* Better Auth has been selected but is not yet integrated.
+* Email delivery has not yet been implemented.
+
+The next work should focus on understanding and implementing the invitation
+workflow before moving deeper into the authentication system.
+

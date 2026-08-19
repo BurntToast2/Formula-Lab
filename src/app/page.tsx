@@ -1,19 +1,10 @@
-import { getTeams } from "@/data/teams";
+import Invite from "@/app/invite-test";
 
-export default async function Home() {
-  const teams = await getTeams();
-
+export default function Home() {
   return (
-    <main>
-      <h1>Formula Lab</h1>
-
-      <h2>Teams</h2>
-
-      <ul>
-        {teams.map((team) => (
-          <li key={team.id}>{team.name}</li>
-        ))}
-      </ul>
-    </main>
+      <main>
+        <h1>Formula Lab</h1>
+        <Invite />
+      </main>
   );
 }
