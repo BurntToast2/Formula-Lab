@@ -1,950 +1,305 @@
-# Formula Student Manager — AI Project Context
+# Formula Lab — AI Context
 
 ## Project
 
-**Name:** Formula Lab
+Formula Lab is a university team/task management application being developed for SETU students.
 
-**Purpose:**
-A full-stack web application for managing a Formula Student team's members,
-teams, projects, tasks, deadlines, and eventually other team workflows.
+The developer is building the application personally and wants to understand the code and architecture rather than have AI write the application for them.
 
-The application should be accessible from anywhere by teammates without the
-developer's personal computer being switched on.
+**Important working rule:** AI should teach, explain, review, debug, and guide the developer. Do not proactively write application code unless the developer explicitly asks for code.
 
----
-
-# Developer
-
-The developer already understands:
-
-* SQL
-* PostgreSQL
-* relational database concepts
-* primary keys
-* foreign keys
-* relationships
-* database normalization
-* React
-* TypeScript
-* Node.js
-* Electron
-* general web/desktop development concepts
-
-The developer is learning:
-
-* Next.js
-* Next.js App Router
-* modern full-stack web architecture
-* browser/server boundaries
-* Server Components
-* Client Components
-* Server Actions
-* Route Handlers
-* production web development
-* Drizzle ORM syntax
-* Drizzle schema design
-* Better Auth
-* authentication architecture
-* Git/Neovim/terminal workflow
-
-### Teaching preference
-
-The developer wants to **write the code themselves**.
-
-AI should act primarily as:
-
-* teacher
-* architect
-* debugger
-* reviewer
-* technical discussion partner
-
-AI should not turn the project into a copy/paste exercise.
-
-When implementing features:
-
-1. Explain the problem first.
-2. Explain the architectural decision.
-3. Explain important syntax when it is unfamiliar.
-4. Let the developer implement the code.
-5. Help diagnose errors.
-6. Prefer small incremental changes.
-7. Avoid dumping complete features unless explicitly requested.
-
-The developer already understands SQL, so database explanations should focus on
-how the concepts translate into Drizzle rather than re-teaching relational
-database fundamentals.
-
-The developer wants to understand decisions well enough to explain the
-resulting architecture in interviews.
+The developer already understands SQL and database concepts well. The main learning areas are TypeScript, React, Next.js, Server Actions, Drizzle ORM syntax, and related application architecture.
 
 ---
 
-# Agreed Stack
+## Current Stack
 
-## Core
-
+* Next.js
 * TypeScript
 * React
-* Next.js
-* Next.js App Router
-* PostgreSQL
+* PostgreSQL hosted on Neon
+* Drizzle ORM
+* Zod
+* Git/GitHub
+
+---
 
 ## Database
 
-* Drizzle ORM
-* Neon PostgreSQL
-* @neondatabase/serverless
+The database currently contains these core entities:
 
-## Authentication
+### Teams
 
-* Better Auth
-* Email/password authentication
-* Invitation-only registration
-
-## Validation
-
-* Zod
-
-## Forms
-
-* React Hook Form
-
-## Styling
-
-* Tailwind CSS
-* shadcn/ui
-
-## Deployment
-
-* Vercel
-* Neon PostgreSQL
-
-## Version control
-
-* Git
-* GitHub
-
-## Testing
-
-* Vitest
-* Playwright
-
-## Later / only when needed
-
-* Sentry
-* Cloudflare R2 or Supabase Storage
-* Resend
-* Realtime technology
-* Inngest or Trigger.dev
-* Advanced search technology
-
----
-
-# Architecture
-
-The application is intentionally **not** split into a separate React frontend
-and Express backend.
-
-The initial architecture is:
-
-Browser → Next.js → Drizzle ORM → Neon PostgreSQL
-
-Next.js will contain:
-
-* React UI
-* Server Components
-* Client Components
-* Server Actions
-* Route Handlers where appropriate
-* authentication
-* authorization
-* validation
-* server-side database access
-
-The application does not initially require a separate backend service.
-
-The developer is specifically using this project to learn Next.js and modern
-full-stack web architecture.
-
----
-
-# Important Next.js Concepts
-
-Next.js should not be described simply as an SSR framework.
-
-The application can mix server and client code.
-
-Important concepts being learned:
-
-* Server Components
-* Client Components
-* Server Actions
-* Route Handlers
-* static rendering
-* dynamic rendering
-* caching
-* authentication
-* authorization
-* browser/server boundaries
-
-SSR is not required for SEO because Formula Lab is an internal team
-application.
-
-Next.js server-side capabilities are useful for:
-
-* server-side logic
-* database access
-* security
-* authentication
-* authorization
-* reducing unnecessary API boilerplate
-
----
-
-# Database Architecture
-
-The application uses:
-
-Next.js → Drizzle ORM → @neondatabase/serverless → Neon PostgreSQL
-
-### Drizzle responsibilities
-
-Drizzle is responsible for:
-
-* defining PostgreSQL schemas in TypeScript
-* querying PostgreSQL
-* providing type-safe database access
-* managing schema changes through Drizzle Kit
-
-### Neon responsibilities
-
-Neon provides the hosted PostgreSQL database.
-
-The database connection string is stored in `.env.local`.
-
-The connection string must never be committed to Git or pasted into
-conversation.
-
-`.env.local` is ignored by Git.
-
----
-
-# Database Files
-
-Current database-related files include:
-
-* `src/db/schema.ts`
-* `src/db/index.ts`
-* `drizzle.config.ts`
-
-### `drizzle.config.ts`
-
-Purpose:
-
-* tells Drizzle Kit where the schema is
-* identifies PostgreSQL as the dialect
-* loads `.env.local`
-* provides `DATABASE_URL` to Drizzle Kit
-
-### `src/db/index.ts`
-
-Contains the application database client.
-
-It is server-only.
-
-It must not be imported into browser/client code because it provides database
-access and depends on server-side environment variables.
-
-The project uses `server-only` to prevent accidental client-side imports.
-
----
-
-# Database Verification
-
-The following have been successfully verified:
-
-* Drizzle ORM is installed and working.
-* Drizzle Kit is installed and working.
-* Neon PostgreSQL connection works.
-* `.env.local` is loaded correctly.
-* `DATABASE_URL` is available without exposing its value.
-* Drizzle Kit can push schema changes to Neon.
-* Application database access works.
-* TypeScript compilation has been successfully verified during development.
-* Temporary database connection tests have successfully queried PostgreSQL.
-
-The temporary database test files used during setup were removed afterward.
-
----
-
-# Drizzle Kit Note
-
-`drizzle-kit check` previously produced an unexpected AWS Data API error even
-though the PostgreSQL/Neon configuration was valid.
-
-The error referred to missing AWS Data API parameters.
-
-This did not prevent the actual Neon workflow from working.
-
-`drizzle-kit push` successfully uses the Neon serverless driver and applies
-schema changes.
-
-Do not spend additional time debugging `drizzle-kit check` unless it becomes
-necessary for the migration workflow.
-
----
-
-# Current Database Model
-
-The real Formula Lab database model has now been designed and implemented in
-Drizzle.
-
-## Teams
-
-A `teams` entity represents a Formula Lab team.
-
-Initial teams:
-
-* Chassis
-* Drivetrain
-* Suspension
-* Brakes
-* Electronics
-
-Additional teams can be added later, for example:
-
-* Business
-* Media
-
-Teams are intentionally data-driven rather than hard-coded so the application
-can grow.
-
-Each team has:
-
-* unique ID
-* unique name
-
----
-
-# Users
-
-The `users` table represents Formula Lab users.
-
-Current conceptual fields:
+Teams have:
 
 * ID
-* name
-* email
-* team
-* role
+* Name
 
-The user's team is represented through a foreign key to `teams`.
+Team names are unique.
 
-The user's role is represented by a PostgreSQL enum.
+### Users
+
+Users have:
+
+* ID
+* Name
+* Email
+* Team
+* Role
+
+Users belong to a team.
 
 Current roles:
 
-* `team_leader`
-* `member`
+* Team leader
+* Member
 
-There is currently a database constraint ensuring that a team has at most one
-team leader.
+There is a database constraint ensuring only one team leader can exist per team.
 
-Authentication will eventually integrate Better Auth with the existing user
-model rather than creating an unnecessary duplicate Formula Lab user table.
+### Tasks
 
-The exact Better Auth integration still needs to be designed and implemented.
+Tasks have:
 
----
+* ID
+* Title
+* Description
+* Team
+* Creator
+* Status
+* Priority
+* Due date
+* Creation timestamp
 
-# Tasks
+Current statuses:
 
-Every task belongs to exactly one team.
-
-A task has:
-
-* title
-* optional description
-* team
-* creator
-* status
-* priority
-* optional due date
-* creation timestamp
-
-A task does **not** have a single primary assignee.
-
-Instead, a task can have multiple responsible users.
-
-This is necessary because Formula Lab has cross-team work.
-
-For example:
-
-A single task could involve:
-
-* one Electronics member
-* one Drivetrain member
-
-Therefore task responsibility is represented using a many-to-many relationship.
-
----
-
-# Task Responsibilities
-
-The `task_responsibilities` table links:
-
-* tasks
-* users
-
-It uses a composite primary key consisting of:
-
-* task ID
-* user ID
-
-This prevents the same user from being assigned responsibility for the same
-task more than once.
-
-A task still belongs to one primary team through its own team foreign key.
-
-The responsible users may belong to different teams.
-
-This supports cross-team tasks.
-
----
-
-# Task Status
-
-Current task statuses:
-
-* `todo`
-* `in_progress`
-* `completed`
-* `cancelled`
-
----
-
-# Task Priority
+* Todo
+* In progress
+* Completed
+* Cancelled
 
 Current priorities:
 
-* `low`
-* `medium`
-* `high`
+* Low
+* Medium
+* High
 
----
+### Task Responsibilities
 
-# Dashboard Requirement
+Tasks can have multiple responsible users.
 
-When a user views the dashboard, they should see the tasks that are still
-pending for their team.
+This is represented through a linking table between tasks and users.
 
-Because tasks can have responsible users from different teams, dashboard
-queries will eventually need to account for both:
+This supports cross-team work because a task can involve people from different teams while remaining associated with its primary team.
 
-* the task's owning team
-* users responsible for the task
+### Invitations
 
-The exact dashboard query logic will be designed when the dashboard is built.
+An invitations table has been added.
 
----
-
-# Invitations
-
-Registration is **invitation-only**.
-
-For the initial MVP:
-
-* only the developer can create invitations
-* team leaders cannot create invitations yet
-* invitations are for SETU student email addresses
-* the required email domain is `setu.ie`
-* the student chooses their own team during registration
-* the invitation does not contain a team
-* new students initially receive the `member` role
-
-The invitation controls whether an email address is authorized to register.
-
-It does not determine the student's team.
-
----
-
-# Invitation Entity
-
-The `invitations` table has been designed and added to the Drizzle schema.
-
-Conceptual fields:
+It stores:
 
 * ID
-* email
-* token
-* expiration timestamp
-* accepted timestamp
-* creation timestamp
+* Email
+* Invitation token
+* Expiry timestamp
+* Accepted timestamp
+* Creation timestamp
 
-### Invitation rules
+Invitation tokens are generated securely on the server.
 
-* ID is a UUID primary key.
-* Email is required.
-* Token is required and unique.
-* Expiration is required.
-* Accepted timestamp is nullable.
-* Creation timestamp is required and defaults to the current time.
+Invitations currently expire after seven days.
 
-`acceptedAt` is used instead of a boolean such as `used`.
+An invitation is considered valid only when:
 
-Therefore:
-
-* `acceptedAt = NULL` means the invitation has not been accepted.
-* a populated `acceptedAt` means the invitation was successfully used.
-
-This preserves useful historical information.
-
-Invitations are not automatically deleted when expired.
-
-An invitation is valid only when it:
-
-* has not been accepted
-* has not expired
-
-Only one active invitation should exist for a given email address.
-
-The implementation of that business rule will be handled when the invitation
-workflow is built.
+* The token matches
+* The invitation has not been accepted
+* The invitation has not expired
 
 ---
 
-# Invitation Security
+## Invitation System
 
-Invitation tokens are temporary secrets.
+The intended authentication flow is:
 
-They must be:
+1. Only the administrator can create invitations for now.
+2. The administrator enters a student's SETU email address.
+3. The email must belong to the `setu.ie` domain.
+4. The server validates the email using Zod.
+5. The server generates a secure random invitation token.
+6. The server calculates a seven-day expiry.
+7. The invitation is stored in PostgreSQL.
+8. The student will eventually receive an invitation link.
+9. The student follows the link.
+10. The server validates the invitation token.
+11. The student signs up using:
 
-* cryptographically random
-* sufficiently unpredictable
-* single-use
-* associated with the invitation record
-* invalid after acceptance
-* invalid after expiration
+* Name
+* Email
+* Password
+* Team selection
 
-Tokens must not be predictable values such as sequential IDs, names, or email
-addresses.
+12. The student chooses their own team.
+13. The invitation email must correspond to the email used during registration.
+14. Once registration succeeds, the invitation will be marked as accepted.
 
-The invitation token is separate from the user's password.
+The university domain is:
 
-The token proves:
+`setu.ie`
 
-> This email address was invited to register.
-
-The password is later handled by Better Auth for authentication.
-
----
-
-# Authentication Design
-
-The application will use Better Auth.
-
-Authentication method:
-
-* email
-* password
-
-Registration is not publicly available.
-
-A student must have a valid invitation before being allowed to create an
-account.
-
-The intended flow is:
-
-1. Developer creates an invitation for a student's SETU email.
-2. Student receives an invitation link.
-3. Student opens the invitation link.
-4. The application validates the invitation.
-5. Student enters their name and password.
-6. Student chooses their Formula Lab team.
-7. The account is created.
-8. The student becomes a `member`.
-9. The invitation is marked as accepted.
-10. The student receives an authenticated session.
-
-The student's team is chosen during registration rather than being selected by
-the person sending the invitation.
-
-The invitation therefore establishes eligibility, while the student chooses
-their team.
+Students must be able to choose their own team rather than having the administrator assign teams manually.
 
 ---
 
-# Authentication vs Authorization
+## Current Server-Side Invitation Logic
 
-These are deliberately separate concepts.
+A Server Action has been created for invitation creation.
 
-### Authentication
+It currently:
 
-Better Auth answers:
+* Validates the email using Zod.
+* Restricts invitations to `@setu.ie`.
+* Generates a secure random token.
+* Creates an expiry date seven days in the future.
+* Inserts the invitation into PostgreSQL using Drizzle.
+* Returns a simple success/failure result.
 
-> Who is this person?
+A second server-side function has been created to retrieve an invitation by token.
 
-### Authorization
+It checks:
 
-Formula Lab answers:
+* Matching token
+* `acceptedAt` is null
+* `expiresAt` is later than the current time
 
-> What is this person allowed to do?
-
-Examples:
-
-* which team the user belongs to
-* whether the user is a team leader
-* which team data they can manage
-* which tasks they can modify
-
-Better Auth handles authentication infrastructure.
-
-Formula Lab owns its application-specific authorization rules.
+The invitation lookup has been tested successfully against the real Neon database.
 
 ---
 
-# Better Auth User Integration
+## React / Next.js Learning
 
-The preferred architecture is to avoid maintaining two separate representations
-of the same person.
+The developer has refreshed basic React concepts including:
 
-The existing Formula Lab `users` model should be integrated with Better Auth's
-user model where practical.
+* Client Components
+* `useState`
+* Event handlers
+* Inputs
+* Buttons
+* Calling Server Actions
+* `async` functions
+* `await`
+* Promises
 
-Better Auth needs additional authentication-related data such as:
+A temporary client-side testing component was created to test invitation creation and invitation lookup.
 
-* sessions
-* authentication credentials
-* potentially accounts/providers
-* verification information
+That testing component has now been removed because its purpose was completed.
 
-The exact Better Auth schema and integration have **not yet been implemented**.
-
-Before modifying the user schema for Better Auth, explicitly discuss:
-
-* Better Auth's required tables
-* how its user table maps to the existing Formula Lab user
-* additional user fields
-* relationships between authentication data and Formula Lab data
-* how invitations interact with registration
-
-Do not blindly replace the existing user model.
+Do not reintroduce temporary testing UI unless it is genuinely useful for debugging.
 
 ---
 
-# Signup Email Rule
+## Database / Drizzle Learning
 
-The initial application is intended for SETU students.
+The developer understands the underlying SQL concepts.
 
-The registration process should enforce the `@setu.ie` email domain.
+When explaining Drizzle, relate syntax to SQL where useful.
 
-The invitation should also be associated with the invited email address.
+Important Drizzle concepts already covered:
 
-The registration flow should ensure that the email used for account creation
-matches the email that was invited.
+* `db.insert(table)`
+* `.values(...)`
+* `db.select()`
+* `.from(table)`
+* `.where(...)`
+* `and(...)`
+* `eq(...)`
+* `isNull(...)`
+* `gt(...)`
+* `.limit(...)`
 
-The student should not be able to use someone else's invitation token to create
-an account for a different email address.
-
----
-
-# Invitation Workflow
-
-The intended future workflow is:
-
-Developer
-→ creates invitation
-→ invitation is stored
-→ invitation email is sent
-→ student clicks secure link
-→ invitation is validated
-→ student registers
-→ student chooses team
-→ Better Auth creates/authenticates the account
-→ invitation is marked accepted
-
-Email delivery has not yet been implemented.
-
-For the first implementation, invitation creation can be tested without
-sending real email.
+The developer understands that Drizzle provides a TypeScript representation of SQL rather than requiring SQL strings for normal queries.
 
 ---
 
-# Current Next.js Direction
+## Git
 
-Invitation functionality will eventually be implemented using server-side
-Next.js logic.
+The project is now connected to GitHub.
 
-A likely structure is:
+The local repository uses the `master` branch.
 
-* UI
-* Server Action
-* invitation validation/business logic
-* Drizzle
-* PostgreSQL
+The GitHub repository is Formula Lab.
 
-The developer is currently learning Server Actions and the browser/server
-boundary.
+The developer has successfully completed their first push to GitHub.
 
-Before implementing the invitation function, explain:
+Useful Git concepts already covered:
 
-* what a Server Action is
-* what `"use server"` means
-* why invitation/database logic belongs on the server
-* what data should cross the browser/server boundary
-
----
-
-# Current Project Structure
-
-The project currently includes:
-
-* `src/app/`
-* `src/app/actions/`
-* `src/db/`
-* `src/data/`
-* `drizzle.config.ts`
-
-The `src/app/actions/` directory has already been used for the seed-team
-Server Action.
-
-Seed teams have been successfully created in the database and are visible in
-the application.
-
-The initial seed functionality was only for development and database setup.
-
----
-
-# Completed Development Milestones
-
-## Milestone 1 — Project Setup
-
-Completed:
-
-* Git repository
-* Next.js project
-* local development
-* basic page
-* initial Git workflow
-
-## Milestone 2 — Database Foundation
-
-Completed:
-
-* PostgreSQL
-* Neon
-* Drizzle ORM
-* Drizzle Kit
-* database client
-* initial schema
-* database connectivity
-* schema deployment
-* teams
-* users
-* tasks
-* task responsibilities
-* enums
-* constraints
-* invitation table
-
-## Milestone 3 — Initial Data
-
-Completed:
-
-* team seed functionality
-* initial Formula Student teams inserted into Neon
-* teams displayed by the application
-
-## Milestone 4 — Authentication
-
-Started.
-
-Agreed:
-
-* Better Auth
-* email/password
-* invitation-only registration
-* SETU email domain
-* developer-only invitation creation
-* student chooses team
-* new users default to member
-
-Remaining:
-
-* Better Auth architecture
-* Better Auth schema
-* Better Auth integration
-* invitation creation
-* invitation validation
-* signup flow
-* sessions
-* protected routes
-* authorization
-
----
-
-# Current Immediate Next Task
-
-The immediate next task is to begin implementing the invitation workflow.
-
-First, understand Next.js Server Actions and the server/client boundary.
-
-Then create the server-side invitation operation that will eventually:
-
-* receive an email
-* validate the SETU domain
-* generate a secure invitation token
-* calculate an expiration time
-* create the invitation record
-* eventually trigger invitation email delivery
-
-Do not implement email delivery yet.
-
-Do not implement the complete signup flow yet.
-
-Build and verify the invitation creation mechanism first.
-
----
-
-# Git / Terminal / Neovim Learning
-
-The developer uses Neovim and the terminal and wants to become comfortable
-with the complete terminal-based workflow.
-
-Teach:
-
-* `git status`
-* `git add`
-* `git commit`
-* `git log`
-* `git diff`
-* `git branch`
-* `git switch`
-* `git merge`
-* `git rebase` when appropriate
+* Working tree
+* Staging
+* Commits
+* Remotes
 * `git push`
-* `git pull`
-* GitHub workflow
-* useful terminal commands
-* Neovim workflow
+* Upstream branches
 
-When giving commands:
-
-1. Explain what each command does.
-2. Explain important flags when relevant.
-3. Prefer safe commands.
-4. Warn before destructive commands.
-
-Important Git concepts:
-
-* working tree = changes not staged
-* staging area = changes selected for the next commit
-* commit = saved snapshot in local Git history
-* push = sends commits to a remote repository
-
-Never commit secrets.
+The developer understands that commits represent meaningful checkpoints and that GitHub receives those commits when pushed.
 
 ---
 
-# AI Usage Philosophy
+## Dashboard Requirement
 
-AI is being used as a development and learning tool.
+When a user views the dashboard, tasks that are still pending for that user's team should be displayed.
 
-AI should help with:
+The system should support cross-team responsibilities.
 
-* explaining concepts
-* debugging
-* comparing approaches
-* researching unfamiliar APIs
-* reviewing code
-* architectural reasoning
-* accelerating learning
+A task may have multiple responsible users from different teams through the task responsibilities linking table.
 
-AI should **not** turn Formula Lab into a black box.
-
-The developer writes the implementation.
-
-Architectural decisions should be explicitly discussed.
-
-If an architectural decision changes, document it in `DECISIONS.md`.
-
-AI should not assume that producing a complete code solution is the best way
-to help.
-
-When the developer asks what to do next, prefer:
-
-1. explain the objective
-2. explain why it matters
-3. identify the relevant concepts
-4. give the developer a small implementation task
-5. review/debug the result
+The person responsible for a task carries out the task, while the task can involve multiple teams.
 
 ---
 
-# Context / Handoff Files
+## Current Development Stage
 
-Recommended project documentation:
+Database foundations are working.
 
-* `docs/PROJECT.md`
-* `docs/ARCHITECTURE.md`
-* `docs/DECISIONS.md`
-* `docs/DATABASE.md`
-* `docs/PROGRESS.md`
-* `docs/AI_CONTEXT.md`
+Team seeding is working.
 
-`AI_CONTEXT.md` is the portable context for AI assistants.
+Invitation creation is working end-to-end.
 
-It should document:
+Invitation verification is working end-to-end.
 
-* architecture
-* decisions
-* project state
-* data model
-* development philosophy
-* current task
-* important constraints
+GitHub backup is working.
 
-It should **not** become a copy of the project's source code.
+The next major feature is the **student invitation/signup flow**.
 
-Source code belongs in the repository.
+The expected sequence is:
 
----
+1. Build the invitation signup URL.
+2. Read the invitation token from the URL.
+3. Verify the invitation server-side.
+4. Show the signup form for valid invitations.
+5. Allow the student to enter their name, email, and password.
+6. Allow the student to choose their own team.
+7. Validate the signup server-side.
+8. Create the user.
+9. Mark the invitation as accepted.
+10. Establish authentication/session handling.
+11. Restrict invitation creation to the administrator.
 
-# Security Rules
-
-Never commit:
-
-* `.env.local`
-* database connection strings
-* passwords
-* authentication secrets
-* invitation tokens
-* API keys
-
-Invitation tokens are secrets and should not be exposed unnecessarily in logs,
-UI, or source control.
-
-Database access must remain server-side.
-
-Client components must not directly import the database client.
+Email delivery should come after the invitation/signup mechanics are working.
 
 ---
 
-# Current Checkpoint
+## Development Style
 
-The following are currently true:
+The developer prefers to build the system themselves and understand what each part does.
 
-* Neon is connected.
-* Drizzle is working.
-* The main database schema exists.
-* Teams exist and have been seeded.
-* Users, tasks, and task responsibility relationships are designed.
-* Invitation schema exists and has been pushed to Neon.
-* The project is ready to begin the invitation/authentication workflow.
-* Better Auth has been selected but is not yet integrated.
-* Email delivery has not yet been implemented.
+When helping:
 
-The next work should focus on understanding and implementing the invitation
-workflow before moving deeper into the authentication system.
+* Explain concepts before or alongside implementation.
+* Relate unfamiliar Drizzle syntax to SQL.
+* Avoid unnecessary abstractions.
+* Work incrementally.
+* Let the developer attempt small pieces when practical.
+* If the developer explicitly asks for code, provide the code and explain the important parts.
+* Do not dump large amounts of application code without being asked.
+* Do not assume the developer is unfamiliar with databases or SQL.
+* Do not over-explain basic SQL concepts unless needed.
 
+The developer wants AI to function primarily as a technical guide and teacher, while the developer remains the person writing the application.

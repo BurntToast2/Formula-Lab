@@ -41,3 +41,29 @@ export async function getInvitationByToken(token: string){
 
     return invitation[0] ?? null;
 }
+
+const signUpSchema = z.object({
+    firstName: z.string().min(2).max(30),
+    surname: z.string().min(2).max(30),
+    password: z.string().min(7).max(30),
+    teamId: z.number(),
+});
+
+export async function validateSignUpCredentials(
+    firstName: string,
+    surname: string,
+    password: string,
+    teamId: number
+) {
+    const result = signUpSchema.safeParse({
+        firstName,
+        surname,
+        password,
+        teamId,
+    });
+
+    console.log(result.error?.flatten);
+
+    return result;
+}
+
