@@ -1,45 +1,120 @@
 # Formula Lab — AI Context
 
-## Project
+## Project Overview
 
-Formula Lab is a university team/task management application being developed for SETU students.
+**Formula Lab** is a university team and task management application being developed for SETU students.
 
-The developer is building the application personally and wants to understand the code and architecture rather than have AI write the application for them.
+The application is intended to support:
 
-**Important working rule:** AI should teach, explain, review, debug, and guide the developer. Do not proactively write application code unless the developer explicitly asks for code.
+* Student accounts
+* Team membership
+* Team leadership
+* Task creation and management
+* Cross-team task responsibilities
+* Invitation-based registration
+* Role-based access
+* Dashboard/task visibility
 
-The developer already understands SQL and database concepts well. The main learning areas are TypeScript, React, Next.js, Server Actions, Drizzle ORM syntax, and related application architecture.
+The project is being developed incrementally, with the application architecture and implementation decisions being understood and maintained throughout development.
 
 ---
 
-## Current Stack
+## Working Rules for AI Assistance
+
+The developer is responsible for writing and maintaining the application.
+
+AI should primarily:
+
+* Explain concepts.
+* Explain why code works.
+* Explain architectural decisions.
+* Review code written by the developer.
+* Debug errors.
+* Suggest approaches.
+* Guide implementation step-by-step.
+* Relate unfamiliar concepts to existing project knowledge.
+
+**Do not proactively provide application code unless the developer explicitly asks for code.**
+
+When code is explicitly requested:
+
+* Provide only the code necessary for the current step.
+* Explain the important parts afterward.
+* Avoid unnecessarily rewriting unrelated files.
+* Avoid jumping ahead to future implementation details.
+
+Do not discuss or infer the developer's skill level in project documentation or responses.
+
+---
+
+# Technology Stack
 
 * Next.js
-* TypeScript
 * React
-* PostgreSQL hosted on Neon
+* TypeScript
+* PostgreSQL
+* Neon
 * Drizzle ORM
 * Zod
-* Git/GitHub
+* Git
+* GitHub
+
+Node.js built-in cryptography is currently used for secure invitation token generation.
+
+Tailwind CSS and/or local CSS may be used for UI styling.
+
+No additional UI component framework is currently required.
 
 ---
 
-## Database
+# Application Architecture
 
-The database currently contains these core entities:
+The project uses the Next.js App Router.
 
-### Teams
+The general architecture is:
 
-Teams have:
+```text
+React UI
+   ↓
+Server Actions
+   ↓
+Validation / business logic
+   ↓
+Drizzle ORM
+   ↓
+PostgreSQL / Neon
+```
+
+Client Components are used when browser-side React state or event handling is required.
+
+Server Components are used where server-side data access can be performed directly.
+
+Server Actions are used for operations that need to execute on the server, particularly mutations and protected database operations.
+
+---
+
+# Database
+
+The database is PostgreSQL hosted on Neon.
+
+Drizzle ORM is used as the TypeScript database layer.
+
+## Teams
+
+Teams currently contain:
 
 * ID
 * Name
 
 Team names are unique.
 
-### Users
+Students can choose their own team during registration.
 
-Users have:
+---
+
+## Users
+
+Users currently contain:
 
 * ID
 * Name
@@ -54,11 +129,13 @@ Current roles:
 * Team leader
 * Member
 
-There is a database constraint ensuring only one team leader can exist per team.
+There is a database constraint ensuring that only one team leader can exist per team.
 
-### Tasks
+---
 
-Tasks have:
+## Tasks
+
+Tasks currently contain:
 
 * ID
 * Title
@@ -83,23 +160,31 @@ Current priorities:
 * Medium
 * High
 
-### Task Responsibilities
+---
 
-Tasks can have multiple responsible users.
+## Task Responsibilities
 
-This is represented through a linking table between tasks and users.
+A task can have multiple responsible users.
 
-This supports cross-team work because a task can involve people from different teams while remaining associated with its primary team.
+This is represented using a linking table between tasks and users.
 
-### Invitations
+This allows tasks to involve people from different teams while still having a primary team association.
 
-An invitations table has been added.
+The intended distinction is:
 
-It stores:
+* The task belongs to a primary team.
+* One or more users are responsible for carrying it out.
+* Responsible users may belong to different teams.
+
+---
+
+## Invitations
+
+The invitations table contains:
 
 * ID
 * Email
-* Invitation token
+* Token
 * Expiry timestamp
 * Accepted timestamp
 * Creation timestamp
@@ -110,196 +195,594 @@ Invitations currently expire after seven days.
 
 An invitation is considered valid only when:
 
-* The token matches
-* The invitation has not been accepted
-* The invitation has not expired
+* The token matches.
+* `acceptedAt` is null.
+* `expiresAt` is later than the current time.
 
 ---
 
-## Invitation System
+# Invitation System
 
-The intended authentication flow is:
+The current invitation flow is:
 
-1. Only the administrator can create invitations for now.
-2. The administrator enters a student's SETU email address.
-3. The email must belong to the `setu.ie` domain.
-4. The server validates the email using Zod.
-5. The server generates a secure random invitation token.
-6. The server calculates a seven-day expiry.
-7. The invitation is stored in PostgreSQL.
-8. The student will eventually receive an invitation link.
-9. The student follows the link.
-10. The server validates the invitation token.
-11. The student signs up using:
+```text
+Administrator
+     ↓
+Enter SETU email
+     ↓
+Zod validation
+     ↓
+Generate secure token
+     ↓
+Calculate 7-day expiry
+     ↓
+Insert invitation
+     ↓
+Invitation link
+     ↓
+Student signup
+```
 
-* Name
-* Email
-* Password
-* Team selection
+For now, only the administrator is intended to create invitations.
 
-12. The student chooses their own team.
-13. The invitation email must correspond to the email used during registration.
-14. Once registration succeeds, the invitation will be marked as accepted.
-
-The university domain is:
+The university email domain is:
 
 `setu.ie`
 
-Students must be able to choose their own team rather than having the administrator assign teams manually.
+Invitation emails must belong to that domain.
+
+Email delivery will be implemented after the invitation and signup mechanics are working.
 
 ---
 
-## Current Server-Side Invitation Logic
+# Invitation Server Actions
 
-A Server Action has been created for invitation creation.
+The invitation server-side logic currently includes functionality to:
 
-It currently:
+### Create an invitation
 
-* Validates the email using Zod.
-* Restricts invitations to `@setu.ie`.
-* Generates a secure random token.
-* Creates an expiry date seven days in the future.
-* Inserts the invitation into PostgreSQL using Drizzle.
-* Returns a simple success/failure result.
+The creation action:
 
-A second server-side function has been created to retrieve an invitation by token.
+1. Validates the email using Zod.
+2. Requires the `@setu.ie` domain.
+3. Generates a secure random token.
+4. Creates an expiry date seven days in the future.
+5. Inserts the invitation into PostgreSQL using Drizzle.
+6. Returns a simple success/failure result.
 
-It checks:
+The token is generated using Node's cryptographic random byte generation and converted to a hexadecimal string.
 
-* Matching token
-* `acceptedAt` is null
-* `expiresAt` is later than the current time
+### Retrieve an invitation
 
-The invitation lookup has been tested successfully against the real Neon database.
+A server-side lookup function retrieves an invitation by token.
 
----
+The lookup checks:
 
-## React / Next.js Learning
+* Matching token.
+* `acceptedAt` is null.
+* `expiresAt` is later than the current time.
 
-The developer has refreshed basic React concepts including:
-
-* Client Components
-* `useState`
-* Event handlers
-* Inputs
-* Buttons
-* Calling Server Actions
-* `async` functions
-* `await`
-* Promises
-
-A temporary client-side testing component was created to test invitation creation and invitation lookup.
-
-That testing component has now been removed because its purpose was completed.
-
-Do not reintroduce temporary testing UI unless it is genuinely useful for debugging.
+This has been tested successfully against the real Neon database.
 
 ---
 
-## Database / Drizzle Learning
+# Signup Flow
 
-The developer understands the underlying SQL concepts.
+The next major feature is the student invitation/signup flow.
 
-When explaining Drizzle, relate syntax to SQL where useful.
+The intended flow is:
 
-Important Drizzle concepts already covered:
+```text
+Student receives invitation
+        ↓
+/signup?token=...
+        ↓
+Extract token
+        ↓
+Verify invitation server-side
+        ↓
+Valid invitation?
+   ┌────┴────┐
+  No        Yes
+   ↓          ↓
+Reject     Signup form
+             ↓
+       Enter registration data
+             ↓
+       Server-side validation
+             ↓
+       Create user
+             ↓
+       Mark invitation accepted
+             ↓
+       Authentication/session
+```
+
+The signup process should use the email stored on the invitation as the trusted email identity.
+
+The student should not be able to use an invitation for one email address to register another email address.
+
+The student chooses their own team.
+
+---
+
+# Signup Route
+
+The signup route is:
+
+`src/app/signup/page.tsx`
+
+The route is:
+
+`/signup`
+
+An invitation link will use a query parameter:
+
+`/signup?token=...`
+
+URL query parameter syntax:
+
+* `?` starts query parameters.
+* `=` separates a parameter name from its value.
+* `&` separates multiple query parameters.
+
+The signup page receives query parameters through Next.js `searchParams`.
+
+The intended page flow is:
+
+```text
+/signup?token=abc123
+        ↓
+searchParams
+        ↓
+token
+        ↓
+getInvitationByToken(token)
+        ↓
+database
+        ↓
+valid invitation?
+```
+
+A plain `/signup` URL should eventually be rejected because no invitation token is supplied.
+
+An invalid, expired, or already-accepted invitation should also be rejected.
+
+---
+
+# Signup Form
+
+The signup form is located at:
+
+`src/app/signup/signup-form.tsx`
+
+It is a Client Component because it requires React state and browser event handling.
+
+The current form contains:
+
+* First name
+* Surname
+* Email
+* Password
+* Create account button
+
+The form currently uses React state for:
+
+* `firstName`
+* `surname`
+* `password`
+
+A team selection still needs to be added.
+
+The email should eventually be supplied by the validated invitation rather than freely entered or modified by the student.
+
+The intended data flow is:
+
+```text
+/signup?token=...
+        ↓
+page.tsx
+        ↓
+getInvitationByToken()
+        ↓
+invitation.email
+        ↓
+SignUpForm
+```
+
+The form's visual design is being developed separately from the backend logic.
+
+---
+
+# React Form Submission
+
+The form should use `onSubmit` on the `<form>` element rather than placing the main submission logic on the submit button's `onClick`.
+
+Reason:
+
+* Clicking the submit button triggers form submission.
+* Pressing Enter can also submit the form.
+* `onSubmit` represents the semantic form operation.
+
+The intended flow is:
+
+```text
+User submits form
+       ↓
+handleSubmit
+       ↓
+preventDefault()
+       ↓
+collect React state
+       ↓
+Server Action
+```
+
+`event.preventDefault()` prevents the browser's default form navigation/submission behaviour so the application can control the submission.
+
+A `handleSubmit` function has been introduced and is intended to call the server-side validation function.
+
+---
+
+# Signup Validation
+
+A Zod schema called `signUpSchema` has been created.
+
+Current validation rules:
+
+* `firstName`
+
+  * string
+  * minimum 2 characters
+  * maximum 30 characters
+
+* `surname`
+
+  * string
+  * minimum 2 characters
+  * maximum 30 characters
+
+* `password`
+
+  * string
+  * minimum 7 characters
+  * maximum 30 characters
+
+* `teamId`
+
+  * number
+
+The current password minimum is seven characters and may be strengthened later.
+
+Email is deliberately excluded from the signup schema because the trusted email should come from the invitation record.
+
+The conceptual structure is:
+
+```text
+Signup form
+    ↓
+firstName
+surname
+password
+teamId
+    ↓
+signUpSchema.safeParse(...)
+    ↓
+success / validation errors
+```
+
+Zod can provide field-specific validation errors even when validating the entire signup object.
+
+`safeParse()` is currently preferred because it returns a result that can be checked through `result.success` rather than throwing an exception for normal validation failures.
+
+Zod's error information can be transformed into form-friendly errors using its error utilities such as `flatten()`.
+
+---
+
+# Server Actions and Async Behaviour
+
+The invitation logic is located in:
+
+`src/app/actions/invitations.ts`
+
+The file uses:
+
+`"use server";`
+
+Exports from this file are treated as Server Actions by Next.js and therefore need to be asynchronous.
+
+Zod's `safeParse()` itself is synchronous.
+
+The `async` requirement is related to the Server Action boundary, not because Zod validation inherently requires asynchronous execution.
+
+General pattern:
+
+```text
+async Server Action
+       ↓
+await database / server operation
+       ↓
+return result
+```
+
+The client receives a Promise when calling an async Server Action, which is why `await` is used when the returned result is needed.
+
+---
+
+# Drizzle ORM
+
+The project uses Drizzle rather than raw SQL strings for normal database operations.
+
+Important syntax already in use:
 
 * `db.insert(table)`
 * `.values(...)`
 * `db.select()`
 * `.from(table)`
 * `.where(...)`
-* `and(...)`
+* `.limit(...)`
 * `eq(...)`
+* `and(...)`
 * `isNull(...)`
 * `gt(...)`
-* `.limit(...)`
 
-The developer understands that Drizzle provides a TypeScript representation of SQL rather than requiring SQL strings for normal queries.
+When explaining Drizzle, relate the operation to its SQL equivalent where useful.
+
+For example:
+
+```text
+Drizzle
+db.select().from(users).where(eq(users.id, id))
+```
+
+corresponds conceptually to:
+
+```sql
+SELECT *
+FROM users
+WHERE id = ...
+```
+
+The project uses Drizzle's TypeScript representation rather than manually constructing SQL strings for normal queries.
 
 ---
 
-## Git
+# Database Validation vs Zod Validation
 
-The project is now connected to GitHub.
+Keep the distinction clear.
 
-The local repository uses the `master` branch.
+## Zod
 
-The GitHub repository is Formula Lab.
+Used for validating the **shape and basic rules of input**.
 
-The developer has successfully completed their first push to GitHub.
+Examples:
 
-Useful Git concepts already covered:
+* Required strings
+* String lengths
+* Email format
+* Password format
+* Numeric IDs
+
+## Database
+
+Used for validating **database state and relationships**.
+
+Examples:
+
+* Does the selected team actually exist?
+* Does the invitation exist?
+* Has the invitation already been accepted?
+* Has the invitation expired?
+* Does the email already belong to a user?
+* Does a team already have a leader?
+
+The intended signup process therefore uses both:
+
+```text
+Form input
+    ↓
+Zod
+    ↓
+basic validity
+    ↓
+Database checks
+    ↓
+business rules
+    ↓
+database mutation
+```
+
+---
+
+# Authentication
+
+Authentication/session handling has not yet been implemented.
+
+The intended order is:
+
+1. Invitation validation.
+2. Signup form.
+3. Server-side signup validation.
+4. User creation.
+5. Invitation acceptance.
+6. Authentication/session handling.
+7. Protected routes/dashboard.
+
+Do not introduce a full authentication system prematurely unless it becomes necessary for the current step.
+
+---
+
+# Dashboard
+
+The dashboard should display tasks relevant to the current user's team.
+
+The system must also support cross-team responsibilities.
+
+The intended model is:
+
+```text
+Task
+ ├── primary team
+ └── responsible users
+          ├── user from Team A
+          ├── user from Team B
+          └── user from Team C
+```
+
+A user's dashboard should account for both their team's tasks and their responsibilities where appropriate.
+
+The exact dashboard query and visibility rules will be defined later.
+
+---
+
+# Git / GitHub
+
+The project is connected to GitHub.
+
+The repository is named:
+
+**Formula Lab**
+
+The local repository currently uses the `master` branch.
+
+The first successful push to GitHub has been completed.
+
+Relevant Git concepts already established:
 
 * Working tree
 * Staging
 * Commits
 * Remotes
-* `git push`
 * Upstream branches
+* `git push`
+* GitHub commit history
 
-The developer understands that commits represent meaningful checkpoints and that GitHub receives those commits when pushed.
-
----
-
-## Dashboard Requirement
-
-When a user views the dashboard, tasks that are still pending for that user's team should be displayed.
-
-The system should support cross-team responsibilities.
-
-A task may have multiple responsible users from different teams through the task responsibilities linking table.
-
-The person responsible for a task carries out the task, while the task can involve multiple teams.
+Git commits should be used as meaningful checkpoints during development.
 
 ---
 
-## Current Development Stage
+# Current Development Status
 
-Database foundations are working.
+Completed:
 
-Team seeding is working.
+* Next.js project foundation
+* PostgreSQL/Neon database connection
+* Drizzle ORM setup
+* Team schema
+* User schema
+* Task schema
+* Task responsibility linking table
+* Invitation schema
+* Team seeding
+* Invitation creation
+* Secure invitation token generation
+* Seven-day invitation expiry
+* Invitation lookup/verification
+* Zod invitation email validation
+* Signup route
+* Initial signup form UI
+* Signup Zod schema
+* Initial React form submission handling
+* Git/GitHub repository connection
+* Initial GitHub push
 
-Invitation creation is working end-to-end.
+Currently being implemented:
 
-Invitation verification is working end-to-end.
+**Student invitation/signup flow**
 
-GitHub backup is working.
+Current immediate sequence:
 
-The next major feature is the **student invitation/signup flow**.
-
-The expected sequence is:
-
-1. Build the invitation signup URL.
-2. Read the invitation token from the URL.
-3. Verify the invitation server-side.
-4. Show the signup form for valid invitations.
-5. Allow the student to enter their name, email, and password.
-6. Allow the student to choose their own team.
-7. Validate the signup server-side.
-8. Create the user.
-9. Mark the invitation as accepted.
-10. Establish authentication/session handling.
-11. Restrict invitation creation to the administrator.
-
-Email delivery should come after the invitation/signup mechanics are working.
+```text
+Signup form
+    ↓
+Add team selection
+    ↓
+Submit form
+    ↓
+Server-side Zod validation
+    ↓
+Return field-specific errors
+    ↓
+Verify invitation
+    ↓
+Check selected team
+    ↓
+Create user
+    ↓
+Mark invitation accepted
+```
 
 ---
 
-## Development Style
+# Immediate Next Step
 
-The developer prefers to build the system themselves and understand what each part does.
+The signup form currently has no `teamId` state.
 
-When helping:
+The next task is to add team selection to the React form.
 
-* Explain concepts before or alongside implementation.
-* Relate unfamiliar Drizzle syntax to SQL.
-* Avoid unnecessary abstractions.
-* Work incrementally.
-* Let the developer attempt small pieces when practical.
-* If the developer explicitly asks for code, provide the code and explain the important parts.
-* Do not dump large amounts of application code without being asked.
-* Do not assume the developer is unfamiliar with databases or SQL.
-* Do not over-explain basic SQL concepts unless needed.
+The intended flow is:
 
-The developer wants AI to function primarily as a technical guide and teacher, while the developer remains the person writing the application.
+```text
+Team selector
+     ↓
+React state
+     ↓
+teamId
+     ↓
+handleSubmit()
+     ↓
+validateSignUpCredentials()
+```
+
+Initially, temporary team options can be used to establish the React flow.
+
+After that, the team options should be loaded from the real `teams` table.
+
+---
+
+# Future Development Order
+
+After the signup flow is working:
+
+1. Complete signup validation.
+2. Verify invitation during signup.
+3. Verify the selected team exists.
+4. Create the user.
+5. Mark the invitation as accepted.
+6. Add authentication/session handling.
+7. Protect application routes.
+8. Implement dashboard access.
+9. Implement role-based permissions.
+10. Add administrator-only invitation creation.
+11. Add invitation email delivery.
+12. Continue building task management functionality.
+
+Email delivery should remain separate from the core invitation/signup mechanics until the registration flow is reliable.
+
+---
+
+# Development Principles
+
+Keep the implementation:
+
+* Incremental
+* Explicit
+* Easy to understand
+* Consistent with the existing architecture
+* Free of unnecessary abstractions
+* Server-side secure where appropriate
+* Validated at trust boundaries
+* Backed by database constraints where appropriate
+
+Prefer understanding the flow over prematurely optimizing or abstracting it.
+
+When introducing new functionality, explain:
+
+1. What problem it solves.
+2. Where it belongs.
+3. How data moves through the system.
+4. Why the chosen approach is appropriate.
+5. What the next step will be.
+
+Do not provide large implementation dumps unless explicitly requested.
+

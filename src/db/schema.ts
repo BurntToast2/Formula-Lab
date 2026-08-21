@@ -44,8 +44,10 @@ export const teams = pgTable("teams", {
 
 export const users = pgTable("users", {
     id: uuid("id").primaryKey().defaultRandom(),
-    name: text("name").notNull(),
+    firstName: text("first_name").notNull(),
+    surname: text("surname").notNull(),
     email: text("email").notNull().unique(),
+    passwordHash: text("password_hash").notNull(),
     teamId: uuid("team_id").notNull().references(() => teams.id),
     role: userRole("role").notNull(),
     },

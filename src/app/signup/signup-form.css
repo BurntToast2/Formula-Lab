@@ -155,3 +155,53 @@
         transition: none;
     }
 }
+
+.select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%238abcb9' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    padding-right: 2.25rem;
+    cursor: pointer;
+}
+
+.select option {
+    background: var(--navy-panel);
+    color: var(--white);
+}
+
+.select:invalid,
+.select option[value=""] {
+    color: var(--slate);
+}
+
+.field-error {
+    margin: 0;
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.72rem;
+    color: #f2726f;
+    letter-spacing: 0.01em;
+}
+
+.input[aria-invalid="true"] {
+    border-color: #f2726f;
+}
+
+.input[aria-invalid="true"]:focus {
+    box-shadow: 0 0 0 3px rgba(242, 114, 111, 0.25);
+}
+
+.input-readonly {
+    color: var(--mist);
+    cursor: default;
+}
+
+.input-readonly:focus {
+    border-color: rgba(211, 221, 224, 0.18);
+    box-shadow: none;
+}
+
+.form-error {
+    margin-bottom: 0.25rem;
+}

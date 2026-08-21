@@ -6,6 +6,7 @@ export default async function SignUp({
 }: {
     searchParams: Promise<{ token?: string }>;
 }) {
+
     const { token } = await searchParams;
 
     if (!token) {
@@ -13,7 +14,6 @@ export default async function SignUp({
             <main>
                 <h1>Invalid Invitation</h1>
                 <p>You need a valid invitation to sign up.</p>
-                <SignUpForm/>
             </main>
         );
     }
@@ -32,6 +32,7 @@ export default async function SignUp({
         <main>
             <h1>Formula Lab Signup</h1>
             <p>Invitation for: {invitation.email}</p>
+            <SignUpForm email={invitation.email} token={invitation.token}/>
         </main>
     );
 }
