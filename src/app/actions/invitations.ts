@@ -1,12 +1,11 @@
 "use server";
 
 import { db } from "@/db";
-import { invitations, users, teams } from "@/db/schema";
+import { invitations, teams } from "@/db/schema";
 import { and, eq, gt, isNull } from "drizzle-orm";
-
 import { z } from "zod";
 import { randomBytes } from "crypto";
-import { hash } from "bcryptjs";
+import { auth } from "@/lib/auth";
 
 const emailSchema = z.email().endsWith("@setu.ie");
 
@@ -79,8 +78,12 @@ export async function createAccount(
     teamName: string,
 ) {
     const invitation = await getInvitationByToken(token);
+
     if (!invitation) {
-        return { success: false as const, error: "Invalid or expired invitation" };
+        return {
+            success: false as const,
+            error: "Invalid or expired invitation",
+        };
     }
 
     const [team] = await db
@@ -89,41 +92,41 @@ export async function createAccount(
         .where(eq(teams.name, teamName));
 
     if (!team) {
-        return { success: false as const, errors: { teamName: ["Team not found"] } };
+        return {
+            success: false as const,
+            errors: {
+                teamName: ["Team not found"],
+            },
+        };
     }
 
-    const passwordHash = await hash(password, 12);
+    const result = await auth.api.signUpEmail({
+        body: {
+            name: `${firstName} ${surname}`,
+            email: invitation.email,
+            password,
+            firstName,
+            surname,
+            teamId: team.id,
+            role: "member",
+        },
+    });
 
-    try {
-        await db.transaction(async (tx) => {
-            await tx.insert(users).values({
-                firstName,
-                surname,
-                email: invitation.email,
-                passwordHash,
-                teamId: team.id,
-                role: "member",
-            });
-
-            await tx
-                .update(invitations)
-                .set({ acceptedAt: new Date() })
-                .where(eq(invitations.token, token));
-        });
-    } catch (err: any) {
-        if (err?.code === "23505") {
-            return {
-                success: false as const,
-                errors: { email: ["An account with this email already exists"] },
-            };
-        }
-        console.error("createAccount failed:", err);
+    if (!result) {
         return {
             success: false as const,
             error: "Something went wrong creating your account. Please try again.",
         };
     }
 
-    return { success: true as const };
-}
+    await db
+        .update(invitations)
+        .set({
+            acceptedAt: new Date(),
+        })
+        .where(eq(invitations.token, token));
 
+    return {
+        success: true as const,
+    };
+}
