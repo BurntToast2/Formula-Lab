@@ -1,11 +1,30 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { db } from "@/db";
+import {
+    users,
+    account,
+    session,
+    verification,
+} from "@/db/schema";
+import { randomUUID } from "crypto";
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "pg",
+        schema: {
+            users,
+            account,
+            session,
+            verification,
+        },
     }),
+
+    advanced: {
+        database: {
+            generateId: () => randomUUID(),
+        },
+    },
 
     user: {
         modelName: "users",
