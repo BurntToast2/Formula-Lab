@@ -1,0 +1,23 @@
+:root {
+  --color-teal: #29968c;
+  --color-teal-dark: #2f837d;
+  --color-teal-muted: #5b7a7b;
+  --color-gray: #b3b7bb;
+  --color-gray-light: #d3dde0;
+  --color-white: #fefefe;
+  --color-slate: #51535d;
+  --color-navy: #313544;
+  --color-yellow: #f7d97b;
+  --color-error: #c4593a;
+}
+
+.task-card {
+  border: 1.5px solid var(--color-gray-light);
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.task-card:hover {
+  border-color: var(--color-teal);
+  box-shadow: 0 4px 16px rgba(49, 53, 68, 0.08);
+  transform: translateY(-1px);
+}
