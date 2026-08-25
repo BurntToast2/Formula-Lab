@@ -12,7 +12,8 @@
 }
 
 .login-input {
-  border: 1.5px solid var(--color-gray);
+  border: 1.5px solid #c3d0d2;
+  background: #ffffff;
   transition: border-color 120ms ease, box-shadow 120ms ease;
 }
 
@@ -24,6 +25,7 @@
 
 .login-btn {
   background-color: var(--color-teal);
+  box-shadow: 0 8px 18px rgba(35, 141, 134, 0.2);
 }
 
 .login-btn:hover:not(:disabled) {
@@ -33,4 +35,10 @@
 .login-btn:disabled {
   background-color: var(--color-teal-muted);
   cursor: default;
+}
+
+@media (max-width: 480px) {
+  .login-input {
+    font-size: 16px;
+  }
 }

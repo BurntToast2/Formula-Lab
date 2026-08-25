@@ -12,7 +12,11 @@
 }
 
 .task-card {
-  border: 1.5px solid var(--color-gray-light);
+  border: 1.5px solid rgba(35, 141, 134, 0.18);
+  box-shadow: 0 12px 26px rgba(5, 10, 16, 0.16);
+  min-height: 148px;
+  border-radius: 0.65rem;
+  background: #f7faf9;
   transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 }
 
@@ -20,4 +24,88 @@
   border-color: var(--color-teal);
   box-shadow: 0 4px 16px rgba(49, 53, 68, 0.08);
   transform: translateY(-1px);
+}
+
+.task-card:focus-visible {
+  outline: 2px solid var(--color-yellow);
+  outline-offset: 3px;
+}
+
+main.min-h-screen > div[class~="max-w-[960px]"] {
+  max-width: 1120px;
+}
+
+main.min-h-screen > div[class~="max-w-[960px]"] > h1 {
+  position: relative;
+  padding-bottom: 1.25rem;
+  color: #f7faf9;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.045em;
+}
+
+main.min-h-screen > div[class~="max-w-[960px]"] > h1::after {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 5.5rem;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-teal), var(--color-yellow));
+  content: "";
+}
+
+main.min-h-screen > div[class~="max-w-[960px]"] > div {
+  gap: 2.75rem;
+}
+
+main.min-h-screen > div[class~="max-w-[960px]"] section {
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(139, 209, 200, 0.14);
+}
+
+main.min-h-screen > div[class~="max-w-[960px]"] > div > section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+main.min-h-screen > div[class~="max-w-[960px]"] section h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  color: #f0f5f4;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+main.min-h-screen > div[class~="max-w-[960px]"] section h2::before {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--color-teal);
+  box-shadow: 0 0 0 4px rgba(56, 182, 170, 0.12);
+  content: "";
+}
+
+main.min-h-screen > div[class~="max-w-[960px]"] section h2 span {
+  color: #8fa7a9;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+main.min-h-screen > div[class~="max-w-[960px]"] section > p {
+  padding: 0.8rem 1rem;
+  border-left: 2px solid rgba(246, 213, 111, 0.7);
+  color: #9db0b2;
+}
+
+@media (max-width: 640px) {
+  main.min-h-screen > div[class~="max-w-[960px]"] section {
+    padding-top: 1.25rem;
+  }
+
+  main.min-h-screen > div[class~="max-w-[960px]"] > div {
+    gap: 2.25rem;
+  }
 }

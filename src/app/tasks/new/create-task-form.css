@@ -13,7 +13,8 @@
 }
 
 .task-field {
-  border: 1.5px solid var(--color-gray);
+  border: 1.5px solid #c3d0d2;
+  background: #ffffff;
   transition: border-color 120ms ease, box-shadow 120ms ease;
 }
 
@@ -29,6 +30,7 @@
 
 .task-submit-btn {
   background-color: var(--color-teal);
+  box-shadow: 0 8px 18px rgba(35, 141, 134, 0.2);
 }
 
 .task-submit-btn:hover:not(:disabled) {
@@ -42,4 +44,9 @@
 
 .task-assignee-row:hover {
   background-color: var(--color-chip-bg);
+}
+
+.task-submit-btn:focus-visible {
+  outline: 2px solid var(--color-yellow);
+  outline-offset: 3px;
 }

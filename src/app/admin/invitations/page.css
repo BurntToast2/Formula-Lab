@@ -25,6 +25,7 @@
 
 .invite-send-btn {
   background-color: var(--color-teal);
+  box-shadow: 0 8px 18px rgba(35, 141, 134, 0.2);
 }
 
 .invite-send-btn:hover:not(:disabled) {
@@ -34,4 +35,10 @@
 .invite-send-btn:disabled {
   background-color: var(--color-teal-muted);
   cursor: default;
+}
+
+.invite-chip-remove:focus-visible,
+.invite-send-btn:focus-visible {
+  outline: 2px solid var(--color-yellow);
+  outline-offset: 3px;
 }

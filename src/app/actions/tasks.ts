@@ -18,6 +18,17 @@ const createTaskSchema = z.object({
     assigneeIds: z.array(z.string().uuid()).optional(),
 });
 
+const updateTaskSchema = z.object({
+    taskId: z.string().uuid(),
+    title: z.string().min(1, "Task title is required").max(100),
+    description: z.string().max(1000).optional(),
+    teamId: z.string().uuid("Please select a valid team"),
+    status: z.enum(["todo", "in_progress", "completed", "cancelled"]),
+    priority: z.enum(["low", "medium", "high"]),
+    dueDate: z.string().optional(),
+    assigneeIds: z.array(z.string().uuid()),
+});
+
 export async function createTask(input: {
     title: string;
     description?: string;
@@ -119,6 +130,103 @@ export async function createTask(input: {
         return {
             success: false as const,
             error: "Something went wrong creating the task.",
+        };
+    }
+}
+
+export async function updateTask(input: {
+    taskId: string;
+    title: string;
+    description?: string;
+    teamId: string;
+    status: "todo" | "in_progress" | "completed" | "cancelled";
+    priority: "low" | "medium" | "high";
+    dueDate?: string;
+    assigneeIds: string[];
+}) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session) {
+        return {
+            success: false as const,
+            error: "You must be logged in.",
+        };
+    }
+
+    const result = updateTaskSchema.safeParse(input);
+
+    if (!result.success) {
+        return {
+            success: false as const,
+            error: "Please check the task details.",
+            errors: z.flattenError(result.error).fieldErrors,
+        };
+    }
+
+    const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, session.user.id))
+        .limit(1);
+
+    if (!user) {
+        return {
+            success: false as const,
+            error: "User not found.",
+        };
+    }
+
+    const [task] = await db
+        .select()
+        .from(tasks)
+        .where(eq(tasks.id, result.data.taskId))
+        .limit(1);
+
+    if (!task) {
+        return {
+            success: false as const,
+            error: "Task not found.",
+        };
+    }
+
+    const canEdit =
+        user.role === "team_leader" ||
+        task.createdById === user.id;
+
+    if (!canEdit) {
+        return {
+            success: false as const,
+            error: "You do not have permission to edit this task.",
+        };
+    }
+
+    try {
+        await db
+            .update(tasks)
+            .set({
+                title: result.data.title,
+                description: result.data.description || null,
+                teamId: result.data.teamId,
+                status: result.data.status,
+                priority: result.data.priority,
+                dueDate: result.data.dueDate
+                    ? new Date(result.data.dueDate)
+                    : null,
+                updatedAt: new Date(),
+            })
+            .where(eq(tasks.id, result.data.taskId));
+
+        return {
+            success: true as const,
+        };
+    } catch (error) {
+        console.error("updateTask failed:", error);
+
+        return {
+            success: false as const,
+            error: "Something went wrong updating the task.",
         };
     }
 }
