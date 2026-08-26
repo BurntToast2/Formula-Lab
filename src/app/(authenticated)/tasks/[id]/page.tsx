@@ -1,11 +1,11 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
-
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { users, tasks, teams, taskResponsibilities } from "@/db/schema";
 import TaskView from "./task-view";
+import "./page.css";
 
 export default async function TaskPage({
     params,
@@ -15,7 +15,6 @@ export default async function TaskPage({
     const session = await auth.api.getSession({
         headers: await headers(),
     });
-
     if (!session) {
         redirect("/login");
     }
@@ -30,10 +29,8 @@ export default async function TaskPage({
 
     if (!task) {
         return (
-            <main className="min-h-screen bg-[var(--color-gray-light)] p-6">
-                <p className="text-[var(--color-slate)]">
-                    Task not found.
-                </p>
+            <main className="task-page">
+                <p className="task-page__not-found">Task not found.</p>
             </main>
         );
     }
@@ -43,7 +40,6 @@ export default async function TaskPage({
         .from(users)
         .where(eq(users.id, session.user.id))
         .limit(1);
-
     if (!user) {
         throw new Error("Authenticated user not found.");
     }
@@ -56,15 +52,10 @@ export default async function TaskPage({
             surname: users.surname,
         })
         .from(taskResponsibilities)
-        .innerJoin(
-            users,
-            eq(taskResponsibilities.userId, users.id)
-        )
+        .innerJoin(users, eq(taskResponsibilities.userId, users.id))
         .where(eq(taskResponsibilities.taskId, task.id));
 
-    const allTeams = await db
-        .select()
-        .from(teams);
+    const allTeams = await db.select().from(teams);
 
     const allUsers = await db
         .select({
@@ -77,13 +68,11 @@ export default async function TaskPage({
         })
         .from(users);
 
-    const canEdit =
-        user.role === "team_leader" ||
-        task.createdById === user.id;
+    const canEdit = user.role === "team_leader" || task.createdById === user.id;
 
     return (
-        <main className="min-h-screen bg-[var(--color-gray-light)] p-6">
-            <div className="mx-auto max-w-[560px]">
+        <main className="task-page">
+            <div className="task-page__container">
                 <TaskView
                     task={task}
                     teams={allTeams}

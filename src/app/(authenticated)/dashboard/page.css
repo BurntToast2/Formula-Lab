@@ -1,0 +1,80 @@
+:root {
+  --edit-ink: #313544;
+  --edit-teal: #29968C;
+  --edit-teal-dark: #2F837D;
+  --edit-teal-soft: #8ABCB9;
+  --edit-slate: #51535D;
+  --edit-border: #D3DDE0;
+  --edit-border-mid: #B3B7BB;
+  --edit-white: #FEFEFE;
+  --edit-gold: #F7D97B;
+}
+
+.dashboard-page {
+  min-height: 100vh;
+  background: var(--edit-ink);
+  padding: 24px;
+}
+
+@media (min-width: 768px) {
+  .dashboard-page {
+    padding: 48px;
+  }
+}
+
+.dashboard-page__container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.dashboard-page__title {
+  margin: 0 0 8px 0;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--edit-white);
+  letter-spacing: -0.01em;
+}
+
+.dashboard-page__lead {
+  margin: 0;
+  font-size: 14px;
+  color: var(--edit-border-mid);
+}
+
+.dashboard-page__section {
+  margin-top: 36px;
+}
+
+.dashboard-page__section-title {
+  margin: 0 0 14px 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--edit-gold);
+}
+
+.dashboard-page__empty {
+  margin: 0;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--edit-border-mid);
+}
+
+.dashboard-page__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .dashboard-page__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-page__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

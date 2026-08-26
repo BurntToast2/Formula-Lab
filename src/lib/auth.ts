@@ -10,6 +10,10 @@ import {
 import { randomUUID } from "crypto";
 
 export const auth = betterAuth({
+    trustedOrigins: [
+        "http://localhost:3000",
+        "http://192.168.1.77:3000",
+    ],
     database: drizzleAdapter(db, {
         provider: "pg",
         schema: {

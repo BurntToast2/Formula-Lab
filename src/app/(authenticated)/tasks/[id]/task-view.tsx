@@ -5,6 +5,7 @@ import type { InferSelectModel } from "drizzle-orm";
 
 import { tasks, teams } from "@/db/schema";
 import EditTaskForm from "./edit-task-form";
+import "./task-view.css";
 
 type Task = InferSelectModel<typeof tasks>;
 type Team = InferSelectModel<typeof teams>;
@@ -24,6 +25,10 @@ type Assignee = {
     firstName: string;
     surname: string;
 };
+
+function initials(a: { firstName: string; surname: string }) {
+    return `${a.firstName.charAt(0)}${a.surname.charAt(0)}`.toUpperCase();
+}
 
 export default function TaskView({
     task,
@@ -53,49 +58,40 @@ export default function TaskView({
     }
 
     const teamName =
-        allTeams.find((team) => team.id === task.teamId)?.name ??
-        "Unknown";
+        allTeams.find((team) => team.id === task.teamId)?.name ?? "Unknown";
 
     return (
-        <div className="w-full rounded-2xl bg-[var(--color-white)] p-8 shadow-[0_2px_24px_rgba(49,53,68,0.08)]">
-            <div className="flex items-center gap-2">
-                <span className="rounded-full bg-[var(--color-gray-light)] px-2 py-1 text-xs">
+        <div className="task-view">
+            <div className="task-view__badges">
+                <span className="task-view__badge task-view__badge--neutral">
                     {task.status.replace("_", " ")}
                 </span>
 
-                <span className="rounded-full bg-[var(--color-yellow)] px-2 py-1 text-xs">
+                <span className="task-view__badge task-view__badge--priority">
                     {task.priority}
                 </span>
 
-                <span className="rounded-full bg-[var(--color-navy)]/10 px-2 py-1 text-xs font-medium text-[var(--color-navy)]">
+                <span className="task-view__badge task-view__badge--team">
                     {teamName}
                 </span>
             </div>
 
-            <h1 className="mt-4 text-xl font-semibold text-[var(--color-navy)]">
-                {task.title}
-            </h1>
+            <h1 className="task-view__title">{task.title}</h1>
 
             {task.description && (
-                <p className="mt-3 whitespace-pre-wrap text-sm text-[var(--color-slate)]">
-                    {task.description}
-                </p>
+                <p className="task-view__description">{task.description}</p>
             )}
 
-            <div className="mt-6 space-y-2 border-t border-[var(--color-gray-light)] pt-6 text-sm">
+            <div className="task-view__details">
                 <p>
                     <strong>Team:</strong> {teamName}
                 </p>
-
                 <p>
-                    <strong>Status:</strong>{" "}
-                    {task.status.replace("_", " ")}
+                    <strong>Status:</strong> {task.status.replace("_", " ")}
                 </p>
-
                 <p>
                     <strong>Priority:</strong> {task.priority}
                 </p>
-
                 <p>
                     <strong>Due date:</strong>{" "}
                     {task.dueDate
@@ -104,33 +100,24 @@ export default function TaskView({
                 </p>
             </div>
 
-            <div className="mt-6 border-t border-[var(--color-gray-light)] pt-6">
-                <p className="text-sm font-semibold text-[var(--color-navy)]">
-                    Assignees
-                </p>
+            <div className="task-view__assignees">
+                <p className="task-view__section-label">Assignees</p>
 
                 {assignees.length > 0 ? (
-                    <div className="mt-3 flex flex-wrap gap-2">
+                    <div className="task-view__assignee-list">
                         {assignees.map((assignee) => (
-                            <div
-                                key={assignee.id}
-                                className="flex items-center gap-2 rounded-full bg-[var(--color-gray-light)] py-1 pl-1 pr-3"
-                            >
-                                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-navy)] text-[10px] font-semibold text-[var(--color-white)]">
-                                    {assignee.firstName.charAt(0)}
-                                    {assignee.surname.charAt(0)}
+                            <div key={assignee.id} className="task-view__assignee">
+                                <span className="task-view__assignee-avatar">
+                                    {initials(assignee)}
                                 </span>
-
-                                <span className="text-xs text-[var(--color-slate)]">
+                                <span className="task-view__assignee-name">
                                     {assignee.name}
                                 </span>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <p className="mt-2 text-sm text-[var(--color-slate)]">
-                        No one assigned
-                    </p>
+                    <p className="task-view__empty">No one assigned</p>
                 )}
             </div>
 
@@ -138,7 +125,7 @@ export default function TaskView({
                 <button
                     type="button"
                     onClick={() => setEditing(true)}
-                    className="task-primary-btn mt-7 rounded-[10px] px-5 py-2.5 text-[13.5px] font-semibold text-[var(--color-white)]"
+                    className="task-view__edit-btn"
                 >
                     Edit task
                 </button>

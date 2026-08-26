@@ -134,6 +134,7 @@ export async function createTask(input: {
     }
 }
 
+// Update the tasks please 
 export async function updateTask(input: {
     taskId: string;
     title: string;
@@ -202,13 +203,36 @@ export async function updateTask(input: {
         };
     }
 
+    //Remove the existing users and add the new ones 
     try {
         await db
-            .update(tasks)
-            .set({
-                title: result.data.title,
-                description: result.data.description || null,
-                teamId: result.data.teamId,
+        .delete(taskResponsibilities)
+        .where(eq(taskResponsibilities.taskId, result.data.taskId));
+
+        if (result.data.assigneeIds.length > 0) {
+            await db.insert(taskResponsibilities).values(
+                result.data.assigneeIds.map((userId) => ({
+                    taskId: result.data.taskId,
+                    userId,
+                }))
+            );
+        }
+    } catch (error) {
+        console.error("Failed to update task assignees:", error);
+
+        return {
+            success: false as const,
+            error: "Something went wrong updating the task assignees.",
+        };
+    }
+
+    try {
+        await db
+        .update(tasks)
+        .set({
+            title: result.data.title,
+            description: result.data.description || null,
+            teamId: result.data.teamId,
                 status: result.data.status,
                 priority: result.data.priority,
                 dueDate: result.data.dueDate
@@ -227,6 +251,73 @@ export async function updateTask(input: {
         return {
             success: false as const,
             error: "Something went wrong updating the task.",
+        };
+    }
+}
+
+export async function deleteTask(taskId: string) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session) {
+        return {
+            success: false as const,
+            error: "You must be logged in.",
+        };
+    }
+
+    const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, session.user.id))
+        .limit(1);
+
+    if (!user) {
+        return {
+            success: false as const,
+            error: "User not found.",
+        };
+    }
+
+    if (user.role !== "team_leader") {
+        return {
+            success: false as const,
+            error: "Only team leaders can delete tasks.",
+        };
+    }
+
+    const [task] = await db
+        .select({ id: tasks.id })
+        .from(tasks)
+        .where(eq(tasks.id, taskId))
+        .limit(1);
+
+    if (!task) {
+        return {
+            success: false as const,
+            error: "Task not found.",
+        };
+    }
+
+    try {
+        await db
+            .delete(taskResponsibilities)
+            .where(eq(taskResponsibilities.taskId, taskId));
+
+        await db
+            .delete(tasks)
+            .where(eq(tasks.id, taskId));
+
+        return {
+            success: true as const,
+        };
+    } catch (error) {
+        console.error("deleteTask failed:", error);
+
+        return {
+            success: false as const,
+            error: "Something went wrong deleting the task.",
         };
     }
 }
