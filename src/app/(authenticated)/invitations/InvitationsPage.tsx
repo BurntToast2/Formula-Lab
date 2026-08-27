@@ -2,7 +2,7 @@
 
 import { useState, useRef, KeyboardEvent, ClipboardEvent } from "react";
 import { createInvitation } from "@/app/actions/invitations";
-import "./page.css";
+import "./InvitationsPage.css";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

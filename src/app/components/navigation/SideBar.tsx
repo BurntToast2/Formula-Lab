@@ -9,6 +9,7 @@ const NAV_ITEMS = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/tasks", label: "Tasks" },
     { href: "/members", label: "Members"},
+    { href: "/invitations", label: "Invitations"},
 ];
 
 export default function Sidebar({

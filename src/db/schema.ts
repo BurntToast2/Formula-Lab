@@ -14,6 +14,7 @@ import {
 export const userRole = pgEnum("user_role", [
     "team_leader",
     "member",
+    "admin"
 ]);
 
 export const taskStatus = pgEnum("task_status", [
