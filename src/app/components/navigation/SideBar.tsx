@@ -8,6 +8,7 @@ import "./Sidebar.css";
 const NAV_ITEMS = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/tasks", label: "Tasks" },
+    { href: "/members", label: "Members"},
 ];
 
 export default function Sidebar({
