@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { InferSelectModel } from "drizzle-orm";
 
 import { tasks, teams } from "@/db/schema";
 import EditTaskForm from "./edit-task-form";
+import { markTaskAsDone } from "@/app/actions/tasks";
 import "./task-view.css";
 
 type Task = InferSelectModel<typeof tasks>;
@@ -44,6 +46,8 @@ export default function TaskView({
     canEdit: boolean;
 }) {
     const [editing, setEditing] = useState(false);
+    const [completing, setCompleting] = useState(false);
+    const [completeError, setCompleteError] = useState("");
 
     if (editing) {
         return (
@@ -59,6 +63,21 @@ export default function TaskView({
 
     const teamName =
         allTeams.find((team) => team.id === task.teamId)?.name ?? "Unknown";
+
+    async function handleMarkAsDone() {
+        setCompleting(true);
+        setCompleteError("");
+
+        const result = await markTaskAsDone(task.id);
+
+        if (!result.success) {
+            setCompleteError(result.error ?? "Something went wrong.");
+            setCompleting(false);
+            return;
+        }
+
+        window.location.reload();
+    }
 
     return (
         <div className="task-view">
@@ -121,15 +140,36 @@ export default function TaskView({
                 )}
             </div>
 
-            {canEdit && (
-                <button
-                    type="button"
-                    onClick={() => setEditing(true)}
-                    className="task-view__edit-btn"
-                >
-                    Edit task
-                </button>
+            {completeError && (
+                <p className="task-view__error">{completeError}</p>
             )}
+
+            <div className="task-view__actions">
+                {canEdit && (
+                    <button
+                        type="button"
+                        onClick={() => setEditing(true)}
+                        className="task-view__edit-btn"
+                    >
+                        Edit task
+                    </button>
+                )}
+
+                {canEdit && task.status !== "completed" && task.status !== "cancelled" ? (
+                    <button
+                        type="button"
+                        onClick={handleMarkAsDone}
+                        disabled={completing}
+                        className="task-view__done-btn"
+                    >
+                        {completing ? "Marking as done..." : "Done"}
+                    </button>
+                ) : (
+                    <Link href="/tasks" className="task-view__done-btn">
+                        Back to tasks
+                    </Link>
+                )}
+            </div>
         </div>
     );
 }

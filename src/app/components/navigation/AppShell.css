@@ -99,3 +99,36 @@
 .app-shell__main {
   min-height: calc(100vh - 64px);
 }
+
+.app-shell__fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--edit-teal);
+  color: var(--edit-white);
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(41, 150, 140, 0.4);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.app-shell__fab:hover {
+  background: var(--edit-teal-dark);
+  box-shadow: 0 10px 24px rgba(41, 150, 140, 0.5);
+  transform: translateY(-2px);
+}
+
+.app-shell__fab:active {
+  transform: translateY(0) scale(0.94);
+}
+
+.app-shell__fab-icon {
+  width: 24px;
+  height: 24px;
+}

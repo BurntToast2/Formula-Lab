@@ -29,6 +29,59 @@ const updateTaskSchema = z.object({
     assigneeIds: z.array(z.string().uuid()),
 });
 
+export async function markTaskAsDone(taskId: string) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+    if (!session) {
+        return {
+            success: false as const,
+            error: "You must be logged in to update a task.",
+        };
+    }
+ 
+    const [task] = await db
+        .select()
+        .from(tasks)
+        .where(eq(tasks.id, taskId))
+        .limit(1);
+ 
+    const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, session.user.id))
+        .limit(1);
+ 
+    if (!user) {
+        return {
+            success: false as const,
+            error: "User not found.",
+        };
+    }
+ 
+    if (!task) {
+        return {
+            success: false as const,
+            error: "Task not found.",
+        };
+    }
+ 
+    try {
+        await db
+            .update(tasks)
+            .set({ status: "completed" })
+            .where(eq(tasks.id, taskId));
+ 
+        return { success: true as const };
+    } catch (error) {
+        console.error("markTaskAsDone failed:", error);
+        return {
+            success: false as const,
+            error: "Something went wrong marking the task as done.",
+        };
+    }
+}
+
 export async function createTask(input: {
     title: string;
     description?: string;

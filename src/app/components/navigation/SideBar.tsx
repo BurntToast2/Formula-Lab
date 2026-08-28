@@ -38,10 +38,19 @@ export default function Sidebar({
                     );
                 })}
             </nav>
-            <button 
-                className="sidebar__signout"
-                onClick={() => authClient.signOut()}>
-                Sign Out
+            <button
+              className="sidebar__signout"
+              onClick={async () => {
+                await authClient.signOut({
+                  fetchOptions: {
+                    onSuccess: () => {
+                      window.location.href = "/login";
+                    },
+                  },
+                });
+              }}
+            >
+              Sign Out
             </button>
         </aside>
     );
