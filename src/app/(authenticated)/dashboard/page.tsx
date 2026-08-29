@@ -4,7 +4,7 @@ import { asc, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { users, tasks, teams, taskResponsibilities } from "@/db/schema";
-import TaskCard from "@/app/(authenticated)/tasks/task-card";
+import DashboardTabs from "./dashboard-tabs";
 import "./page.css";
 
 export default async function DashboardPage() {
@@ -63,6 +63,7 @@ export default async function DashboardPage() {
         .where(eq(tasks.teamId, user.teamId))
         .orderBy(asc(tasks.dueDate));
 
+    // tasks already shown under "Your Tasks" don't need to repeat here
     const teamTasks = teamTasksRaw.filter((t) => !myTaskIds.has(t.id));
 
     return (
@@ -72,39 +73,11 @@ export default async function DashboardPage() {
                     Welcome, {user.firstName}
                 </h1>
 
-                <section className="dashboard-page__section">
-                    <h2 className="dashboard-page__section-title">Your Tasks</h2>
-
-                    {myTasks.length === 0 ? (
-                        <p className="dashboard-page__empty">
-                            Nothing assigned to you right now.
-                        </p>
-                    ) : (
-                        <div className="dashboard-page__grid">
-                            {myTasks.map((task) => (
-                                <TaskCard key={task.id} task={task} />
-                            ))}
-                        </div>
-                    )}
-                </section>
-
-                <section className="dashboard-page__section">
-                    <h2 className="dashboard-page__section-title">
-                        {team ? team.name : "Your Team"}
-                    </h2>
-
-                    {teamTasks.length === 0 ? (
-                        <p className="dashboard-page__empty">
-                            No other tasks on your team right now.
-                        </p>
-                    ) : (
-                        <div className="dashboard-page__grid">
-                            {teamTasks.map((task) => (
-                                <TaskCard key={task.id} task={task} />
-                            ))}
-                        </div>
-                    )}
-                </section>
+                <DashboardTabs
+                    myTasks={myTasks}
+                    teamTasks={teamTasks}
+                    teamName={team ? team.name : "Your Team"}
+                />
             </div>
         </main>
     );

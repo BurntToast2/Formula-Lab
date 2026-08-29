@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { users, tasks, teams } from "@/db/schema";
-import TaskCard from "./task-card";
+import TasksTabs from "./tasks-tabs";
 import "./page.css";
 
 export default async function TasksPage() {
@@ -40,48 +40,17 @@ export default async function TasksPage() {
         tasksByTeam.set(task.teamId, existing);
     }
 
+    const teamsWithTasks = orderedTeams.map((team) => ({
+        team,
+        isOwnTeam: team.id === currentUser.teamId,
+        tasks: tasksByTeam.get(team.id) ?? [],
+    }));
+
     return (
         <main className="tasks-page">
             <div className="tasks-page__container">
                 <h1 className="tasks-page__title">All Tasks</h1>
-
-                <div className="tasks-page__teams">
-                    {orderedTeams.map((team, i) => {
-                        const teamTasks = tasksByTeam.get(team.id) ?? [];
-                        const isOwnTeam = team.id === currentUser?.teamId;
-
-                        return (
-                            <section
-                                key={team.id}
-                                className="tasks-page__team"
-                                style={{ animationDelay: `${i * 0.06}s` }}
-                            >
-                                <div className="tasks-page__team-header">
-                                    <h2 className="tasks-page__team-name">
-                                        {isOwnTeam ? "Your Team" : team.name}
-                                    </h2>
-                                    {isOwnTeam && (
-                                        <span className="tasks-page__badge">
-                                            {team.name}
-                                        </span>
-                                    )}
-                                </div>
-
-                                {teamTasks.length === 0 ? (
-                                    <p className="tasks-page__empty">
-                                        No tasks yet.
-                                    </p>
-                                ) : (
-                                    <div className="tasks-page__grid">
-                                        {teamTasks.map((task) => (
-                                            <TaskCard key={task.id} task={task} />
-                                        ))}
-                                    </div>
-                                )}
-                            </section>
-                        );
-                    })}
-                </div>
+                <TasksTabs teamsWithTasks={teamsWithTasks} />
             </div>
         </main>
     );
